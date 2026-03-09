@@ -1,201 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VoxCraft — Text-to-Speech Editor</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:#FBFBFB;color:#18181b;min-height:100vh;-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center}
-.app{width:100%;max-width:1062px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh}
-
-/* ── TABS ── */
-.tabs{padding-top:24px;display:flex;justify-content:center}
-.tabs-bar{
-  display:flex;gap:4px;background:#f4f4f5;border:1px solid #e4e4e7;
-  border-radius:12px;height:40px;padding:4px;width:448px;
-}
-.tab{
-  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
-  border:none;background:none;border-radius:8px;cursor:pointer;
-  font-family:'Inter',sans-serif;font-size:14px;font-weight:500;line-height:20px;
-  color:#71717a;transition:.15s;padding:8px 12px;
-}
-.tab.active{background:#fff;color:#18181b;box-shadow:0 1px 2px rgba(0,0,0,.05)}
-.tab:hover:not(.active){background:rgba(0,0,0,.03)}
-.tab svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none}
-
-/* ── CONTENT CARD ── */
-.content-area{padding:24px;width:100%}
-.card{
-  background:#fff;border:1px solid #e4e4e7;border-radius:8px;
-  box-shadow:0 1px 2px rgba(0,0,0,.05);padding:24px;
-  display:flex;flex-direction:column;gap:40px;
-}
-
-/* ── SLIDE ROW ── */
-.slide{display:flex;gap:16px;align-items:flex-start;border-radius:6px}
-.slide-badge{
-  font-family:'Inter',sans-serif;font-size:12px;font-weight:500;line-height:16px;
-  color:#52525b;padding:2px 6px;border-radius:6px;white-space:nowrap;
-  background:#fff;border:1px solid #e4e4e7;flex-shrink:0;
-}
-.te{
-  font-family:'Inter',sans-serif;font-size:14px;font-weight:400;line-height:20px;
-  color:#18181b;outline:none;cursor:text;flex:1;min-width:0;
-  word-wrap:break-word;overflow-wrap:break-word;
-}
-.te:empty::before{content:'Type slide text...';color:#71717a;pointer-events:none}
-
-/* ── GENERATE BUTTON ── */
-.btn-generate{
-  width:100%;height:40px;border:none;border-radius:8px;
-  background:#1d4ed8;color:#fff;
-  box-shadow:0 1px 2px rgba(30,64,175,.4),0 0 0 1px #1e40af,inset 0 .75px 0 rgba(255,255,255,.24);
-  font-family:'Inter',sans-serif;font-size:14px;font-weight:500;line-height:20px;
-  cursor:pointer;transition:.12s;display:flex;align-items:center;justify-content:center;gap:8px;
-}
-.btn-generate:hover{background:#1e40af}
-.btn-generate svg{width:16px;height:16px;stroke:#fff;stroke-width:2;fill:none}
-
-/* ── MODIFIER WORD ── */
-.mw{position:relative;cursor:pointer;display:inline;transition:.15s;background:rgba(29,78,216,.15);border:none;border-radius:2px;padding:0 2px;box-shadow:0 2px 0 #1d4ed8}
-.mw:hover{background:rgba(29,78,216,.22)}
-.mw[data-tip]:hover::after{
-  content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
-  background:#18181b;color:#fff;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;line-height:16px;
-  padding:6px 10px;border-radius:6px;white-space:nowrap;pointer-events:none;z-index:10;
-}
-.mw[data-tip]:hover::before{
-  content:'';position:absolute;bottom:calc(100% + 2px);left:50%;transform:translateX(-50%);
-  border:4px solid transparent;border-top-color:#18181b;pointer-events:none;z-index:10;
-}
-
-/* counter badge — 12px circle like Figma */
-.mw-count{
-  position:absolute;top:-6px;right:-4px;
-  font-family:'Inter',sans-serif;font-size:8px;font-weight:600;
-  width:12px;height:12px;line-height:12px;text-align:center;
-  border-radius:10px;color:#fff;pointer-events:none;background:#1d4ed8;
-}
-
-
-/* ── CONTEXT MENU (cascading) — Figma exact values ── */
-.ctx-wrap{position:fixed;z-index:1000;display:flex;align-items:flex-start;gap:6px;pointer-events:none;user-select:none;-webkit-user-select:none}
-.ctx-wrap.visible{pointer-events:auto}
-.ctx-panel{
-  font-family:'Inter',sans-serif;
-  background:#fff;border:1px solid #e4e4e7;border-radius:8px;
-  box-shadow:0 4px 6px rgba(0,0,0,.1),0 2px 4px rgba(0,0,0,.06);
-  padding-bottom:4px;min-width:310px;
-  opacity:0;transform:translateX(-4px) scale(.97);
-  transition:opacity .15s cubic-bezier(.16,1,.3,1),transform .15s cubic-bezier(.16,1,.3,1);
-}
-.ctx-panel.vis{opacity:1;transform:translateX(0) scale(1)}
-.ctx-panel.sub{min-width:220px}
-
-/* header */
-.ctx-hd{padding:12px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;line-height:16px;color:#71717a}
-.ctx-sep{height:8px;position:relative}
-.ctx-sep::after{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:#e4e4e7}
-
-/* ── menu item row ── */
-.ctx-it{
-  display:flex;align-items:center;gap:8px;padding:8px;margin:0 4px;
-  border-radius:4px;cursor:pointer;transition:background .1s;
-  border:none;background:none;width:calc(100% - 8px);
-  font-family:'Inter',sans-serif;font-size:14px;color:#18181b;text-align:left;
-}
-.ctx-it:hover{background:#f4f4f5}
-.ctx-it.active-item{background:#f4f4f5}
-
-/* featured icon box (40x40 white box with shadow-border) */
-.ctx-ic-box{
-  width:40px;height:40px;border-radius:8px;background:#fff;
-  box-shadow:0 1px 2px rgba(24,24,27,.12),0 0 0 1px rgba(24,24,27,.08);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.ctx-ic-box svg{width:24px;height:24px;stroke:#18181b;stroke-width:1.5;fill:none}
-
-/* text block (label + desc) */
-.ctx-it-t{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
-.ctx-it-l{font-weight:400;font-size:14px;line-height:20px;color:#18181b}
-.ctx-it-d{font-size:12px;line-height:16px;color:#71717a}
-
-/* right side */
-.ctx-it-arrow{color:#71717a;flex-shrink:0;display:flex;align-items:center}
-.ctx-it-arrow svg{width:16px;height:16px;stroke:#71717a;stroke-width:1.5;fill:none}
-.ctx-it-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
-
-/* badge (value tag) — shadcn Badge White */
-.ctx-val{
-  font-family:'Inter',sans-serif;font-size:12px;font-weight:500;line-height:16px;
-  padding:2px 6px;border-radius:6px;color:#52525b;white-space:nowrap;
-  max-width:90px;overflow:hidden;text-overflow:ellipsis;
-  background:#fff;box-shadow:0 1px 2px rgba(24,24,27,.12),0 0 0 1px rgba(24,24,27,.08);
-}
-/* remove button — 16px icon, transparent */
-.ctx-del{
-  width:16px;height:16px;border:none;background:none;
-  color:#71717a;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;padding:0;transition:.12s;
-}
-.ctx-del:hover{color:#C53030}
-.ctx-del svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none}
-
-/* ── sub-panel: accent ── */
-.a-item{
-  display:flex;align-items:center;gap:8px;padding:8px;margin:0 4px;
-  border:none;border-radius:4px;background:none;
-  font-family:'Inter',sans-serif;font-size:14px;line-height:20px;color:#18181b;
-  cursor:pointer;transition:.1s;text-align:left;width:calc(100% - 8px);
-}
-.a-item:hover{background:#f4f4f5}
-.a-flag{font-size:16px;width:16px;text-align:center;line-height:16px}
-
-/* ── sub-panel: say-as ── */
-.sa-section-label{font-family:'Inter',sans-serif;font-size:12px;font-weight:500;line-height:16px;color:#71717a;padding:12px}
-.sa-lang-grid{display:flex;gap:8px;flex-wrap:wrap;padding:4px 12px 12px}
-.sa-lang{
-  padding:4px 8px;border-radius:6px;background:#fafafa;
-  box-shadow:0 1px 2px rgba(24,24,27,.12),0 0 0 1px rgba(24,24,27,.08);
-  font-family:'Inter',sans-serif;font-size:12px;font-weight:500;line-height:16px;
-  color:#52525b;cursor:pointer;transition:.12s;border:none;
-}
-.sa-lang:hover{background:#f0f0f0}
-.sa-form{padding:4px 12px 12px;display:flex;flex-direction:column;gap:16px}
-.sa-input{
-  width:100%;height:40px;padding:8px 12px;border:none;border-radius:8px;
-  box-shadow:0 1px 2px rgba(24,24,27,.12),0 0 0 1px rgba(24,24,27,.08);
-  font-family:'Inter',sans-serif;font-size:14px;line-height:20px;color:#18181b;
-  background:#fff;outline:none;transition:box-shadow .15s;
-}
-.sa-input:focus{box-shadow:0 0 0 2px #1d4ed8,0 0 0 1px #1d4ed8}
-.sa-input::placeholder{color:#71717a}
-.btn-ap{
-  width:100%;height:40px;border:none;border-radius:8px;
-  background:#1d4ed8;color:#fff;
-  box-shadow:0 1px 2px rgba(30,64,175,.4),0 0 0 1px #1e40af,inset 0 .75px 0 rgba(255,255,255,.24);
-  font-family:'Inter',sans-serif;font-size:14px;font-weight:500;line-height:20px;
-  cursor:pointer;transition:.12s;display:flex;align-items:center;justify-content:center;gap:8px;
-}
-.btn-ap:hover{background:#1e40af}
-.btn-ap svg{width:16px;height:16px;stroke:#fff;stroke-width:2;fill:none}
-
-@media(max-width:640px){.app{padding:0 16px}.content-area{padding:16px}.card{padding:16px;gap:24px}.te{font-size:13px}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoxCraft — Text-to-Speech Editor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
 <div class="app">
+  <!-- Tabs -->
   <div class="tabs">
     <div class="tabs-bar">
-      <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Preview</button>
-      <button class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>Scenario</button>
-      <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Subtitles</button>
+      <button class="tab">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Preview
+      </button>
+      <button class="tab active">
+        <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+        Scenario
+      </button>
+      <button class="tab">
+        <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Subtitles
+      </button>
     </div>
   </div>
+
+  <!-- Hints -->
+  <div class="hints">
+    <span class="hint">
+      <svg viewBox="0 0 24 24"><line x1="10" y1="4" x2="10" y2="20"/><line x1="14" y1="4" x2="14" y2="20"/></svg>
+      Pause
+    </span>
+    <span class="hint">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+      Accent
+    </span>
+    <span class="hint">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M7 9h10"/><path d="M7 13h6"/></svg>
+      Say As
+    </span>
+  </div>
+
+  <!-- Slide Editor -->
   <div class="content-area">
     <div class="card" id="cardSlides">
       <div class="slide">
@@ -218,16 +68,20 @@ body{font-family:'Inter',sans-serif;background:#FBFBFB;color:#18181b;min-height:
         <span class="slide-badge">Slide 5</span>
         <div class="te" contenteditable="true" spellcheck="false">The Brandenburg Gate, an 18th-century neoclassical monument, symbolizes unity and peace in Berlin. Its stunning architecture and rich history make it a must-see attraction for visitors.</div>
       </div>
-      <button class="btn-generate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>Generate all voiceover</button>
+      <button class="btn-generate">
+        <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+        Generate all voiceover
+      </button>
     </div>
   </div>
 </div>
 
-<!-- ═══ CASCADING CONTEXT MENU ═══ -->
+<!-- Context Menu (Cascading) -->
 <div class="ctx-wrap" id="ctxWrap">
   <div class="ctx-panel" id="panelMain"></div>
-  <!-- sub-panels populated by JS -->
-  <div class="ctx-panel sub" id="subAccent" style="display:none">
+
+  <!-- Sub-panel: Accent -->
+  <div class="ctx-panel sub" id="subAccent" style="display: none">
     <div class="ctx-hd">Choose accent</div>
     <div class="ctx-sep"></div>
     <button class="a-item" data-acc="PL" data-acc-l="Polish"><span class="a-flag">🇵🇱</span>Polish</button>
@@ -237,7 +91,9 @@ body{font-family:'Inter',sans-serif;background:#FBFBFB;color:#18181b;min-height:
     <button class="a-item" data-acc="ES" data-acc-l="Spanish"><span class="a-flag">🇪🇸</span>Spanish</button>
     <button class="a-item" data-acc="IT" data-acc-l="Italian"><span class="a-flag">🇮🇹</span>Italian</button>
   </div>
-  <div class="ctx-panel sub" id="subSayAs" style="display:none">
+
+  <!-- Sub-panel: Say As -->
+  <div class="ctx-panel sub" id="subSayAs" style="display: none">
     <div class="sa-section-label">Choose language</div>
     <div class="sa-lang-grid">
       <button class="sa-lang" data-sal="PL">🇵🇱 PL</button>
@@ -250,323 +106,14 @@ body{font-family:'Inter',sans-serif;background:#FBFBFB;color:#18181b;min-height:
     <div class="sa-section-label">Or type your own</div>
     <div class="sa-form">
       <input class="sa-input" id="saInput" type="text" placeholder="Type how to pronounce...">
-      <button class="btn-ap" id="btnSaApply"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg> Apply</button>
+      <button class="btn-apply" id="btnSaApply">
+        <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+        Apply
+      </button>
     </div>
   </div>
 </div>
 
-<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
-<script>
-// ═══ CONFIG ═══
-const MC = {
-  pause:  { label:'Pause',  desc:'Insert pause after word',
-    icon:'<line x1="10" y1="4" x2="10" y2="20"/><line x1="14" y1="4" x2="14" y2="20"/>' },
-  accent: { label:'Accent', desc:'Pronounce with accent',
-    icon:'<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20"/><line x1="2" y1="12" x2="22" y2="12"/>' },
-  sayas:  { label:'Say As', desc:'Alternative pronunciation',
-    icon:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M7 9h10"/><path d="M7 13h6"/>' },
-};
-const MOD_ORDER = ['pause','accent','sayas'];
-const SECTION_BREAK_AFTER = null; // no separators — clean design
-
-// ═══ REFS ═══
-const cardSlides = document.getElementById('cardSlides');
-const ctxWrap = document.getElementById('ctxWrap');
-const panelMain = document.getElementById('panelMain');
-const subAccent = document.getElementById('subAccent');
-const subSayAs = document.getElementById('subSayAs');
-const allSubs = [subAccent, subSayAs];
-const subMap = { accent:subAccent, sayas:subSayAs };
-
-let savedSel = null;
-let targetMW = null; // .mw element we're editing (null = new word)
-
-// helper: find parent .te from a node
-function findParentTE(node) {
-  if (!node) return null;
-  if (node.nodeType === Node.TEXT_NODE) node = node.parentElement;
-  return node ? node.closest('.te') : null;
-}
-
-// ═══ PREVENT SELECTION LOSS ═══
-ctxWrap.addEventListener('mousedown', e => e.preventDefault());
-
-// ═══ TEXT SELECTION → OPEN MENU (single word only) — delegated ═══
-cardSlides.addEventListener('mouseup', e => {
-  if (e.target.closest('.mw')) return;
-  const te = e.target.closest('.te');
-  if (!te) return;
-
-  const sel = window.getSelection();
-  const txt = sel.toString().trim();
-  if (!txt) return;
-  if (!te.contains(sel.anchorNode) || !te.contains(sel.focusNode)) return;
-
-  // SINGLE WORD ONLY: reject if contains whitespace
-  if (/\s/.test(txt)) return;
-
-  savedSel = { range: sel.getRangeAt(0).cloneRange(), text: txt };
-  targetMW = null;
-
-  const rect = sel.getRangeAt(0).getBoundingClientRect();
-  openMenu(rect.left, rect.bottom + 8, txt, null);
-});
-
-// ═══ CLICK EXISTING MODIFIER → SAME MENU — delegated ═══
-cardSlides.addEventListener('click', e => {
-  const mw = e.target.closest('.mw');
-  if (!mw) return;
-  if (!mw.closest('.te')) return;
-  if (window.getSelection().toString().trim()) return;
-  e.stopPropagation();
-
-  targetMW = mw;
-  savedSel = { existingEl: mw, text: getTextContent(mw) };
-
-  const rect = mw.getBoundingClientRect();
-  openMenu(rect.left, rect.bottom + 8, getTextContent(mw), mw);
-});
-
-// ═══ BUILD MAIN MENU (unified for new & existing) ═══
-function openMenu(x, y, word, mw) {
-  hideAll();
-  const mods = mw ? JSON.parse(mw.dataset.mods || '[]') : [];
-  const modMap = {};
-  mods.forEach(m => modMap[m.type] = m);
-
-  // Build menu HTML
-  let html = `<div class="ctx-hd">Edit word</div>`;
-
-  const chevronSVG = `<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>`;
-  const xSVG = `<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
-
-  MOD_ORDER.forEach(type => {
-    const c = MC[type];
-    const active = modMap[type];
-    const hasArrow = !!subMap[type]; // only accent & sayas have sub-panels
-
-    html += `<div class="ctx-it${active ? ' active-item' : ''}" data-open="${type}">`;
-    html += `<div class="ctx-ic-box"><svg viewBox="0 0 24 24">${c.icon}</svg></div>`;
-    // label + description (ALWAYS shown)
-    html += `<div class="ctx-it-t"><span class="ctx-it-l">${c.label}</span><span class="ctx-it-d">${c.desc}</span></div>`;
-
-    if (active) {
-      const valText = active.badge || active.value;
-      html += `<span class="ctx-val">${valText}</span>`;
-      html += `<button class="ctx-del" data-remove="${type}">${xSVG}</button>`;
-    } else {
-      if (hasArrow) html += `<span class="ctx-it-arrow">${chevronSVG}</span>`;
-    }
-    html += `</div>`;
-
-    if (type === SECTION_BREAK_AFTER) html += `<div class="ctx-sep"></div>`;
-  });
-
-  panelMain.innerHTML = html;
-
-  // Event: open sub-panel or apply
-  panelMain.querySelectorAll('.ctx-it[data-open]').forEach(btn => {
-    btn.addEventListener('click', e => {
-      // don't trigger if clicking the ✕ delete button
-      if (e.target.closest('.ctx-del')) return;
-      const type = btn.dataset.open;
-      clearActive();
-      btn.classList.add('active-item');
-
-      if (type === 'pause') { applyMod('pause', 'On'); return; }
-      if (subMap[type]) {
-        openSub(subMap[type]);
-        if (type === 'sayas') {
-          document.getElementById('saInput').value = '';
-          setTimeout(() => document.getElementById('saInput').focus(), 60);
-        }
-      }
-    });
-  });
-
-  // Event: remove modifier
-  panelMain.querySelectorAll('.ctx-del[data-remove]').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      const type = btn.dataset.remove;
-      if (!targetMW) return;
-      const mods = JSON.parse(targetMW.dataset.mods || '[]');
-      const idx = mods.findIndex(m => m.type === type);
-      if (idx >= 0) mods.splice(idx, 1);
-      targetMW.dataset.mods = JSON.stringify(mods);
-      refreshMW(targetMW);
-
-      if (mods.length === 0) {
-        hideAll();
-        savedSel = null;
-        targetMW = null;
-      } else {
-        // re-open menu to reflect changes
-        const rect = targetMW.getBoundingClientRect();
-        openMenu(rect.left, rect.bottom + 8, getTextContent(targetMW), targetMW);
-      }
-    });
-  });
-
-  // Position & show
-  ctxWrap.style.left = x + 'px';
-  ctxWrap.style.top = y + 'px';
-  ctxWrap.classList.add('visible');
-  requestAnimationFrame(() => { panelMain.classList.add('vis'); adjustPos(); });
-}
-
-function getTextContent(mw) {
-  let t = '';
-  mw.childNodes.forEach(n => { if (n.nodeType === Node.TEXT_NODE) t += n.textContent; });
-  return t.trim();
-}
-
-// ═══ CASCADING ═══
-let activeSub = null;
-
-function closeSub() {
-  allSubs.forEach(s => { s.classList.remove('vis'); s.style.display = 'none'; });
-  activeSub = null;
-}
-
-function clearActive() {
-  panelMain.querySelectorAll('.ctx-it').forEach(b => b.classList.remove('active-item'));
-}
-
-function openSub(panel) {
-  closeSub();
-  panel.style.display = 'block';
-  activeSub = panel;
-  panel.classList.add('vis');
-  requestAnimationFrame(adjustPos);
-}
-
-function adjustPos() {
-  const r = ctxWrap.getBoundingClientRect();
-  let x = parseFloat(ctxWrap.style.left), y = parseFloat(ctxWrap.style.top);
-  if (r.right > window.innerWidth - 12) x = window.innerWidth - r.width - 12;
-  if (r.bottom > window.innerHeight - 12) y -= (r.bottom - window.innerHeight + 16);
-  if (x < 12) x = 12; if (y < 12) y = 12;
-  ctxWrap.style.left = x + 'px'; ctxWrap.style.top = y + 'px';
-}
-
-// ═══ APPLY HANDLERS ═══
-subAccent.addEventListener('click', e => {
-  const b = e.target.closest('[data-acc]');
-  if (b && savedSel) applyMod('accent', b.dataset.accL, b.dataset.acc);
-});
-
-// Say As — language chips (badge = emoji + code)
-subSayAs.addEventListener('click', e => {
-  const b = e.target.closest('[data-sal]');
-  if (b && savedSel) applyMod('sayas', 'lang:' + b.dataset.sal, b.textContent.trim());
-});
-
-// Say As — custom input
-document.getElementById('btnSaApply').addEventListener('click', () => {
-  const v = document.getElementById('saInput').value.trim();
-  if (v && savedSel) applyMod('sayas', v);
-});
-document.getElementById('saInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btnSaApply').click(); }
-});
-
-
-// ═══ CORE: APPLY MODIFIER ═══
-function applyMod(type, value, badge) {
-  // Editing existing word
-  if (targetMW) {
-    const mw = targetMW;
-    const mods = JSON.parse(mw.dataset.mods || '[]');
-    const idx = mods.findIndex(m => m.type === type);
-    const mod = { type, value };
-    if (badge) mod.badge = badge;
-    if (idx >= 0) mods[idx] = mod; else mods.push(mod);
-    mw.dataset.mods = JSON.stringify(mods);
-    refreshMW(mw);
-    hideAll();
-    return;
-  }
-
-  // New word
-  if (!savedSel || !savedSel.range) return;
-  const { range, text } = savedSel;
-  const mods = [{ type, value }];
-  if (badge) mods[0].badge = badge;
-
-  const mw = buildMW(text, mods);
-  range.deleteContents();
-  range.insertNode(mw);
-
-  const next = mw.nextSibling;
-  if (!next || (next.nodeType === Node.TEXT_NODE && !next.textContent.startsWith(' ')))
-    mw.after(document.createTextNode('\u00A0'));
-
-  window.getSelection().removeAllRanges();
-  savedSel = null;
-  targetMW = null;
-  hideAll();
-}
-
-// ═══ BUILD / REFRESH MW ═══
-function buildMW(text, mods) {
-  const el = document.createElement('span');
-  el.className = 'mw';
-  el.dataset.mods = JSON.stringify(mods);
-  el.setAttribute('contenteditable', 'false');
-  renderMWInner(el, text, mods);
-  return el;
-}
-
-function refreshMW(mw) {
-  const mods = JSON.parse(mw.dataset.mods || '[]');
-  const text = getTextContent(mw);
-  if (!mods.length) { const parentTE = findParentTE(mw); mw.replaceWith(document.createTextNode(text)); if (parentTE) parentTE.normalize(); return; }
-  mw.innerHTML = '';
-  renderMWInner(mw, text, mods);
-}
-
-function renderMWInner(el, text, mods) {
-  // counter badge (uniform blue — new Figma design)
-  const count = document.createElement('span');
-  count.className = 'mw-count';
-  count.textContent = mods.length;
-  el.appendChild(count);
-
-  // text
-  el.appendChild(document.createTextNode(text));
-
-  // tooltip
-  const tip = mods.map(m => {
-    const label = MC[m.type]?.label || m.type;
-    const val = m.badge || m.value;
-    return val && val !== 'On' ? `${label}: ${val}` : label;
-  }).join(' · ');
-  el.dataset.tip = tip;
-}
-
-// ═══ UTILS ═══
-function hideAll() {
-  ctxWrap.classList.remove('visible');
-  panelMain.classList.remove('vis');
-  closeSub(); clearActive();
-}
-
-document.addEventListener('mousedown', e => {
-  if (ctxWrap.contains(e.target)) return;
-  if (ctxWrap.classList.contains('visible')) { hideAll(); savedSel = null; targetMW = null; }
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { hideAll(); savedSel = null; targetMW = null; }
-});
-
-// ═══ TAB SWITCHING ═══
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-  });
-});
-</script>
+<script src="app.js"></script>
 </body>
 </html>
