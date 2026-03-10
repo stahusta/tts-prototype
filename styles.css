@@ -574,6 +574,7 @@ body {
    ============================================ */
 #subSayAs {
   width: max-content;
+  min-width: 300px;
 }
 
 .sa-section-label {
