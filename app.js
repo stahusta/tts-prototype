@@ -379,15 +379,8 @@ $panelMain.addEventListener('click', (e) => {
     refreshModifierWord(targetModifierWord);
     ignoreInput = false;
 
-    if (mods.length === 0) {
-      closeSubPanels();
-      savedSelection = null;
-      targetModifierWord = null;
-      hideMenu();
-    } else {
-      closeSubPanels();
-      buildMainPanel(getWordText(targetModifierWord), targetModifierWord);
-    }
+    closeSubPanels();
+    buildMainPanel(getWordText(targetModifierWord), targetModifierWord);
 
     updateSlideFromContent(card);
     return;
