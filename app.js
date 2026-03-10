@@ -46,6 +46,8 @@ let targetModifierWord = null;
 let ignoreInput = false;
 const slideTextDirty = {};
 const slideModsSnapshot = {};
+const slideOriginalHTML = {};
+let activeToastSlide = null;
 
 // ============================================
 // SVG Templates
@@ -569,9 +571,64 @@ $slidesArea.addEventListener('input', (e) => {
   const card = te.closest('.slide-card');
   if (!card || card.dataset.state === 'no-audio') return;
 
-  slideTextDirty[card.dataset.slide] = true;
+  const slideId = card.dataset.slide;
+  slideTextDirty[slideId] = true;
   updateSlideFromContent(card);
+
+  // Hide sources and show toast on first manual edit
+  const sources = card.querySelector('.slide-sources');
+  if (sources && sources.style.display !== 'none') {
+    if (!slideOriginalHTML[slideId]) {
+      slideOriginalHTML[slideId] = te.innerHTML;
+    }
+    sources.style.display = 'none';
+    showToast(card);
+  }
 });
+
+// ============================================
+// Toast: Linked references lost
+// ============================================
+
+const $toast = document.getElementById('toastRefs');
+const $btnToastUndo = document.getElementById('btnToastUndo');
+const $btnToastClose = document.getElementById('btnToastClose');
+
+function showToast(card) {
+  activeToastSlide = card;
+  $toast.classList.add('visible');
+}
+
+function hideToast() {
+  $toast.classList.remove('visible');
+  activeToastSlide = null;
+}
+
+$btnToastUndo.addEventListener('click', () => {
+  if (!activeToastSlide) return;
+  const card = activeToastSlide;
+  const slideId = card.dataset.slide;
+  const te = card.querySelector('.te');
+  const sources = card.querySelector('.slide-sources');
+
+  // Restore original text
+  if (slideOriginalHTML[slideId] && te) {
+    ignoreInput = true;
+    te.innerHTML = slideOriginalHTML[slideId];
+    ignoreInput = false;
+    delete slideOriginalHTML[slideId];
+  }
+
+  // Show sources again
+  if (sources) sources.style.display = '';
+
+  // Reset dirty state
+  slideTextDirty[slideId] = false;
+  updateSlideFromContent(card);
+  hideToast();
+});
+
+$btnToastClose.addEventListener('click', hideToast);
 
 // ============================================
 // Event: Generate Audio / Regenerate Audio
