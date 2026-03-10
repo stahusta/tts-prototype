@@ -49,6 +49,7 @@ const SUB_MAP = { accent: $subAccent, sayas: $subSayAs };
 let savedSelection = null;
 let targetModifierWord = null;
 let activeSubPanel = null;
+let currentVersion = 'v1';
 
 // ============================================
 // SVG Templates
@@ -328,6 +329,7 @@ function applyModifier(type, value, badge) {
 // ============================================
 
 $card.addEventListener('mouseup', (e) => {
+  if (currentVersion !== 'v1') return;
   if (e.target.closest('.mw')) return;
 
   const editor = e.target.closest('.te');
@@ -353,6 +355,7 @@ $card.addEventListener('mouseup', (e) => {
 // ============================================
 
 $card.addEventListener('click', (e) => {
+  if (currentVersion !== 'v1') return;
   const mwEl = e.target.closest('.mw');
   if (!mwEl) return;
   if (!mwEl.closest('.te')) return;
@@ -420,12 +423,258 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ============================================
-// Event: Tab Switching
+// Event: Version Switching
 // ============================================
+
+const $ctxWrapV2 = document.getElementById('ctxWrapV2');
+const $panelV2 = document.getElementById('panelV2');
+const $subAccentV2 = document.getElementById('subAccentV2');
+const $subSayAsV2 = document.getElementById('subSayAsV2');
+const $saInputV2 = document.getElementById('saInputV2');
+const $btnSaApplyV2 = document.getElementById('btnSaApplyV2');
+const $v2WordLabel = document.getElementById('v2WordLabel');
+
+const V2_SUB_PANELS = [$subAccentV2, $subSayAsV2];
 
 for (const tab of document.querySelectorAll('.tab')) {
   tab.addEventListener('click', () => {
     for (const t of document.querySelectorAll('.tab')) t.classList.remove('active');
     tab.classList.add('active');
+    currentVersion = tab.dataset.version;
+    resetMenuState();
+    hideV2Menu();
   });
 }
+
+// ============================================
+// V2 Context Menu — Logic
+// ============================================
+
+function closeV2SubPanels() {
+  for (const panel of V2_SUB_PANELS) {
+    panel.classList.remove('vis');
+    panel.style.display = 'none';
+  }
+}
+
+function hideV2Menu() {
+  $ctxWrapV2.classList.remove('visible');
+  $panelV2.classList.remove('vis');
+  closeV2SubPanels();
+}
+
+function adjustV2Position() {
+  const rect = $ctxWrapV2.getBoundingClientRect();
+  let nx = parseFloat($ctxWrapV2.style.left);
+  let ny = parseFloat($ctxWrapV2.style.top);
+  if (rect.right > window.innerWidth - 12) nx = window.innerWidth - rect.width - 12;
+  if (rect.bottom > window.innerHeight - 12) ny -= rect.bottom - window.innerHeight + 16;
+  if (nx < 12) nx = 12;
+  if (ny < 12) ny = 12;
+  $ctxWrapV2.style.left = nx + 'px';
+  $ctxWrapV2.style.top = ny + 'px';
+}
+
+function buildV2MainPanel(word, mwEl) {
+  const mods = mwEl ? JSON.parse(mwEl.dataset.mods || '[]') : [];
+  const modsByType = {};
+  for (const mod of mods) modsByType[mod.type] = mod;
+
+  $v2WordLabel.textContent = word ? `"${word}"` : 'Edit word';
+
+  const ICON_X = '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+
+  // Update each menu item to show active state
+  for (const item of $panelV2.querySelectorAll('[data-v2action]')) {
+    const type = item.dataset.v2action;
+    const activeMod = modsByType[type];
+
+    // Remove old val/remove elements
+    const oldVal = item.querySelector('.ctx-v2-val');
+    const oldRemove = item.querySelector('.ctx-v2-remove');
+    if (oldVal) oldVal.remove();
+    if (oldRemove) oldRemove.remove();
+
+    // Show/hide chevron
+    const chevron = item.querySelector('.ctx-v2-chevron');
+    const shortcut = item.querySelector('.ctx-v2-shortcut');
+
+    if (activeMod) {
+      const displayValue = activeMod.badge || activeMod.value;
+      if (chevron) chevron.style.display = 'none';
+      if (shortcut) shortcut.style.display = 'none';
+
+      const valEl = document.createElement('span');
+      valEl.className = 'ctx-v2-val';
+      valEl.textContent = displayValue;
+      item.appendChild(valEl);
+
+      const removeEl = document.createElement('button');
+      removeEl.className = 'ctx-v2-remove';
+      removeEl.dataset.v2remove = type;
+      removeEl.innerHTML = ICON_X;
+      item.appendChild(removeEl);
+    } else {
+      if (chevron) chevron.style.display = '';
+      if (shortcut) shortcut.style.display = '';
+    }
+  }
+}
+
+function openV2Menu(x, y, word, mwEl) {
+  hideV2Menu();
+  buildV2MainPanel(word, mwEl);
+
+  $ctxWrapV2.style.left = x + 'px';
+  $ctxWrapV2.style.top = y + 'px';
+  $ctxWrapV2.classList.add('visible');
+
+  requestAnimationFrame(() => {
+    $panelV2.classList.add('vis');
+    adjustV2Position();
+  });
+}
+
+function openV2SubPanel(panel) {
+  closeV2SubPanels();
+  panel.style.display = 'block';
+  requestAnimationFrame(() => {
+    panel.classList.add('vis');
+    adjustV2Position();
+  });
+}
+
+// V2: Apply modifier (reuses V1's applyModifier function)
+function applyV2Modifier(type, value, badge) {
+  applyModifier(type, value, badge);
+}
+
+// V2: Open on word selection
+$card.addEventListener('mouseup', (e) => {
+  if (currentVersion !== 'v2') return;
+  if (e.target.closest('.mw')) return;
+
+  const editor = e.target.closest('.te');
+  if (!editor) return;
+
+  const sel = window.getSelection();
+  const text = sel.toString().trim();
+  if (!text) return;
+  if (!editor.contains(sel.anchorNode) || !editor.contains(sel.focusNode)) return;
+  if (/\s/.test(text)) return;
+
+  savedSelection = { range: sel.getRangeAt(0).cloneRange(), text };
+  targetModifierWord = null;
+
+  const rect = sel.getRangeAt(0).getBoundingClientRect();
+  openV2Menu(rect.left, rect.bottom + 8, text, null);
+});
+
+// V2: Click existing modifier word
+$card.addEventListener('click', (e) => {
+  if (currentVersion !== 'v2') return;
+  const mwEl = e.target.closest('.mw');
+  if (!mwEl) return;
+  if (!mwEl.closest('.te')) return;
+  if (window.getSelection().toString().trim()) return;
+
+  e.stopPropagation();
+  targetModifierWord = mwEl;
+  savedSelection = { existingEl: mwEl, text: getWordText(mwEl) };
+
+  const rect = mwEl.getBoundingClientRect();
+  openV2Menu(rect.left, rect.bottom + 8, getWordText(mwEl), mwEl);
+});
+
+// V2: Main menu item clicks
+$panelV2.addEventListener('click', (e) => {
+  // Handle remove button
+  const removeBtn = e.target.closest('.ctx-v2-remove');
+  if (removeBtn && targetModifierWord) {
+    e.stopPropagation();
+    const type = removeBtn.dataset.v2remove;
+    const mods = JSON.parse(targetModifierWord.dataset.mods || '[]');
+    const idx = mods.findIndex((m) => m.type === type);
+    if (idx >= 0) mods.splice(idx, 1);
+
+    targetModifierWord.dataset.mods = JSON.stringify(mods);
+    refreshModifierWord(targetModifierWord);
+
+    if (mods.length === 0) {
+      hideV2Menu();
+      savedSelection = null;
+      targetModifierWord = null;
+    } else {
+      const rect = targetModifierWord.getBoundingClientRect();
+      openV2Menu(rect.left, rect.bottom + 8, getWordText(targetModifierWord), targetModifierWord);
+    }
+    return;
+  }
+
+  const item = e.target.closest('[data-v2action]');
+  if (!item) return;
+
+  const type = item.dataset.v2action;
+
+  if (type === 'pause') {
+    applyV2Modifier('pause', 'On');
+    hideV2Menu();
+    return;
+  }
+
+  if (type === 'accent') {
+    openV2SubPanel($subAccentV2);
+  } else if (type === 'sayas') {
+    openV2SubPanel($subSayAsV2);
+    $saInputV2.value = '';
+    setTimeout(() => $saInputV2.focus(), 60);
+  }
+});
+
+// V2: Accent sub-panel
+$subAccentV2.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-v2acc]');
+  if (btn && savedSelection) {
+    applyV2Modifier('accent', btn.dataset.v2accL, btn.dataset.v2acc);
+    hideV2Menu();
+  }
+});
+
+// V2: Say As sub-panel — language buttons
+$subSayAsV2.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-v2sal]');
+  if (btn && savedSelection) {
+    applyV2Modifier('sayas', 'lang:' + btn.dataset.v2sal, btn.textContent.trim());
+    hideV2Menu();
+  }
+});
+
+// V2: Say As — custom input
+$btnSaApplyV2.addEventListener('click', () => {
+  const value = $saInputV2.value.trim();
+  if (value && savedSelection) {
+    applyV2Modifier('sayas', value);
+    hideV2Menu();
+  }
+});
+
+$saInputV2.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    $btnSaApplyV2.click();
+  }
+});
+
+// V2: Close on outside click
+document.addEventListener('mousedown', (e) => {
+  if ($ctxWrapV2.contains(e.target)) return;
+  if ($ctxWrapV2.classList.contains('visible')) hideV2Menu();
+});
+
+// V2: Prevent selection loss
+$ctxWrapV2.addEventListener('mousedown', (e) => e.preventDefault());
+
+// V2: Close on escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && $ctxWrapV2.classList.contains('visible')) hideV2Menu();
+});

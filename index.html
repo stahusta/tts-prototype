@@ -11,39 +11,18 @@
 <body>
 
 <div class="app">
-  <!-- Tabs -->
+  <!-- Version Switch -->
   <div class="tabs">
     <div class="tabs-bar">
-      <button class="tab">
-        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-        Preview
+      <button class="tab active" data-version="v1">
+        Version 1
       </button>
-      <button class="tab active">
-        <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
-        Scenario
-      </button>
-      <button class="tab">
-        <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-        Subtitles
+      <button class="tab" data-version="v2">
+        Version 2
       </button>
     </div>
   </div>
 
-  <!-- Hints -->
-  <div class="hints">
-    <span class="hint">
-      <svg viewBox="0 0 24 24"><line x1="10" y1="4" x2="10" y2="20"/><line x1="14" y1="4" x2="14" y2="20"/></svg>
-      Pause
-    </span>
-    <span class="hint">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-      Accent
-    </span>
-    <span class="hint">
-      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M7 9h10"/><path d="M7 13h6"/></svg>
-      Say As
-    </span>
-  </div>
 
   <!-- Slide Editor -->
   <div class="content-area">
@@ -110,6 +89,79 @@
         <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
         Apply
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- Context Menu V2 (shadcn-style) -->
+<div class="ctx-wrap" id="ctxWrapV2">
+  <div class="ctx-panel ctx-v2" id="panelV2">
+    <div class="ctx-v2-group-label" id="v2WordLabel">Edit word</div>
+    <div class="ctx-v2-sep"></div>
+    <button class="ctx-v2-item" data-v2action="pause">
+      <svg class="ctx-v2-icon" viewBox="0 0 24 24"><line x1="10" y1="4" x2="10" y2="20"/><line x1="14" y1="4" x2="14" y2="20"/></svg>
+      <span class="ctx-v2-label">Pause</span>
+      <span class="ctx-v2-shortcut">⌘P</span>
+    </button>
+    <button class="ctx-v2-item has-sub" id="v2AccentTrigger" data-v2action="accent">
+      <svg class="ctx-v2-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+      <span class="ctx-v2-label">Accent</span>
+      <span class="ctx-v2-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+    </button>
+    <button class="ctx-v2-item has-sub" id="v2SayAsTrigger" data-v2action="sayas">
+      <svg class="ctx-v2-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M7 9h10"/><path d="M7 13h6"/></svg>
+      <span class="ctx-v2-label">Say As</span>
+      <span class="ctx-v2-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+    </button>
+  </div>
+
+  <!-- Sub-panel: Accent (shadcn-style) -->
+  <div class="ctx-panel ctx-v2 sub" id="subAccentV2" style="display: none">
+    <div class="ctx-v2-group-label">Choose accent</div>
+    <div class="ctx-v2-sep"></div>
+    <button class="ctx-v2-item" data-v2acc="PL" data-v2acc-l="Polish">
+      <span class="ctx-v2-flag">🇵🇱</span>
+      <span class="ctx-v2-label">Polish</span>
+    </button>
+    <button class="ctx-v2-item" data-v2acc="EN" data-v2acc-l="English">
+      <span class="ctx-v2-flag">🇬🇧</span>
+      <span class="ctx-v2-label">English</span>
+    </button>
+    <button class="ctx-v2-item" data-v2acc="FR" data-v2acc-l="French">
+      <span class="ctx-v2-flag">🇫🇷</span>
+      <span class="ctx-v2-label">French</span>
+    </button>
+    <button class="ctx-v2-item" data-v2acc="DE" data-v2acc-l="German">
+      <span class="ctx-v2-flag">🇩🇪</span>
+      <span class="ctx-v2-label">German</span>
+    </button>
+    <button class="ctx-v2-item" data-v2acc="ES" data-v2acc-l="Spanish">
+      <span class="ctx-v2-flag">🇪🇸</span>
+      <span class="ctx-v2-label">Spanish</span>
+    </button>
+    <button class="ctx-v2-item" data-v2acc="IT" data-v2acc-l="Italian">
+      <span class="ctx-v2-flag">🇮🇹</span>
+      <span class="ctx-v2-label">Italian</span>
+    </button>
+  </div>
+
+  <!-- Sub-panel: Say As (shadcn-style) -->
+  <div class="ctx-panel ctx-v2 sub" id="subSayAsV2" style="display: none">
+    <div class="ctx-v2-group-label">Choose language</div>
+    <div class="ctx-v2-sep"></div>
+    <div class="ctx-v2-lang-grid">
+      <button class="ctx-v2-lang-btn" data-v2sal="PL">🇵🇱 PL</button>
+      <button class="ctx-v2-lang-btn" data-v2sal="EN">🇬🇧 EN</button>
+      <button class="ctx-v2-lang-btn" data-v2sal="FR">🇫🇷 FR</button>
+      <button class="ctx-v2-lang-btn" data-v2sal="DE">🇩🇪 DE</button>
+      <button class="ctx-v2-lang-btn" data-v2sal="ES">🇪🇸 ES</button>
+      <button class="ctx-v2-lang-btn" data-v2sal="IT">🇮🇹 IT</button>
+    </div>
+    <div class="ctx-v2-sep"></div>
+    <div class="ctx-v2-group-label">Or type your own</div>
+    <div class="ctx-v2-form">
+      <input class="ctx-v2-input" id="saInputV2" type="text" placeholder="Type how to pronounce...">
+      <button class="ctx-v2-apply" id="btnSaApplyV2">Apply</button>
     </div>
   </div>
 </div>
