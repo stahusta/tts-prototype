@@ -396,6 +396,11 @@ $saInput.addEventListener('keydown', (e) => {
   }
 });
 
+// Show/hide Apply button based on input value
+$saInput.addEventListener('input', () => {
+  $btnSaApply.classList.toggle('hidden', !$saInput.value.trim());
+});
+
 // ============================================
 // Event: Prevent Selection Loss on Menu Click
 // ============================================

@@ -186,16 +186,16 @@
   <div class="ctx-panel ctx-v2" id="panelMain">
     <div class="ctx-v2-group-label" id="menuWordLabel">Edit word</div>
     <button class="ctx-v2-item" data-action="pause">
-      <svg class="ctx-v2-icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+      <span class="ctx-color-dot"></span>
       <span class="ctx-v2-label">Pause</span>
     </button>
     <button class="ctx-v2-item has-sub" data-action="accent">
-      <svg class="ctx-v2-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+      <span class="ctx-color-dot"></span>
       <span class="ctx-v2-label">Tone</span>
       <span class="ctx-v2-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
     </button>
     <button class="ctx-v2-item has-sub" data-action="sayas">
-      <svg class="ctx-v2-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M7 8h5"/><path d="M7 12h10"/></svg>
+      <span class="ctx-color-dot"></span>
       <span class="ctx-v2-label">Say As</span>
       <span class="ctx-v2-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
     </button>
@@ -219,15 +219,13 @@
       <button class="sa-lang" data-sal="FR">🇫🇷 FR</button>
       <button class="sa-lang" data-sal="DE">🇩🇪 DE</button>
       <button class="sa-lang" data-sal="ES">🇪🇸 ES</button>
-      <button class="sa-lang" data-sal="IT">🇮🇹 IT</button>
     </div>
-    <div class="sa-section-label">Or type your own</div>
+    <div class="sa-section-label">or type your own</div>
     <div class="sa-form">
-      <input class="sa-input" id="saInput" type="text" placeholder="Type how to pronounce...">
-      <button class="btn-apply" id="btnSaApply">
-        <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
-        Apply
-      </button>
+      <div class="sa-input-wrap">
+        <input class="sa-input" id="saInput" type="text" placeholder="Type how to pronounce...">
+        <button class="btn-apply-inline hidden" id="btnSaApply">Apply</button>
+      </div>
     </div>
   </div>
 </div>
