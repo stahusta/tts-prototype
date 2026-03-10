@@ -1,5 +1,5 @@
 /* ============================================
-   VoxCraft — Text-to-Speech Editor
+   Flipatic — Text to Speech Editor Prototype
    ============================================ */
 
 /* --- Reset & Base --- */
@@ -275,15 +275,26 @@ body {
   cursor: pointer;
   display: inline;
   transition: 0.15s;
-  background: rgba(29, 78, 216, 0.15);
   border: none;
   border-radius: 2px;
-  padding: 0 2px;
-  box-shadow: 0 2px 0 #1d4ed8;
+  padding: 0;
+  margin: 0;
+  /* background and underline set dynamically by JS */
 }
 
 .mw:hover {
-  background: rgba(29, 78, 216, 0.22);
+  filter: brightness(0.92);
+}
+
+/* Gradient underline bar */
+.mw-line {
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 1px;
+  pointer-events: none;
 }
 
 /* Tooltip */
@@ -316,24 +327,6 @@ body {
   border-top-color: #18181b;
   pointer-events: none;
   z-index: 10;
-}
-
-/* Counter badge */
-.mw-count {
-  position: absolute;
-  top: -6px;
-  right: -4px;
-  font-family: 'Inter', sans-serif;
-  font-size: 8px;
-  font-weight: 600;
-  width: 12px;
-  height: 12px;
-  line-height: 12px;
-  text-align: center;
-  border-radius: 10px;
-  color: #fff;
-  pointer-events: none;
-  background: #1d4ed8;
 }
 
 /* ============================================
@@ -377,6 +370,7 @@ body {
 
 .ctx-panel.sub {
   min-width: 220px;
+  padding-top: 4px;
 }
 
 /* Header & Separator */
@@ -402,6 +396,8 @@ body {
   align-items: center;
   gap: 8px;
   padding: 8px;
+  height: 36px;
+  box-sizing: border-box;
   border-radius: 4px;
   cursor: pointer;
   transition: background 0.1s;
@@ -440,6 +436,19 @@ body {
   border-radius: 2px;
   background: #3b82f6;
   border: 1px solid rgba(24, 24, 27, 0.12);
+}
+
+/* Per-modifier dot colors from Figma tokens */
+[data-action="pause"] .ctx-color-dot::after {
+  background: #f97316; /* tag/warning/tag-orange-icon */
+}
+
+[data-action="accent"] .ctx-color-dot::after {
+  background: #c084fc; /* tag/purple/tag-purple-icon */
+}
+
+[data-action="sayas"] .ctx-color-dot::after {
+  background: #3b82f6; /* tag/blue/tag-blue-icon */
 }
 
 .ctx-v2-chevron {
@@ -495,7 +504,7 @@ body {
 }
 
 .ctx-v2-item .ctx-v2-remove:hover {
-  color: #dc2626;
+  color: #18181b;
 }
 
 .ctx-v2-item .ctx-v2-remove svg {
@@ -662,11 +671,6 @@ body {
   100% { opacity: 1; transform: scale(1); }
 }
 
-@keyframes badge-in {
-  from { opacity: 0; transform: scale(0.6); }
-  to { opacity: 1; transform: scale(1); }
-}
-
 @keyframes tooltip-in {
   from { opacity: 0; transform: translateX(-50%) translateY(4px); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -675,11 +679,6 @@ body {
 /* Modifier word pop-in */
 .mw {
   animation: mw-pop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* Counter badge scale-in */
-.mw-count {
-  animation: badge-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* Tooltip fade-in */
@@ -706,18 +705,10 @@ body {
   transition: background 0.1s;
 }
 
-/* Badge/val pop-in */
-.ctx-v2-val {
-  animation: badge-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
 
-/* Remove button rotate on hover */
+/* Remove button */
 .ctx-v2-remove {
-  transition: color 0.12s, transform 0.15s ease;
-}
-
-.ctx-v2-remove:hover {
-  transform: rotate(90deg);
+  transition: color 0.12s;
 }
 
 /* Reduce motion for accessibility */

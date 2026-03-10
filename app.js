@@ -1,5 +1,5 @@
 /**
- * VoxCraft — Text-to-Speech Editor
+ * Flipatic — Text to Speech Editor Prototype
  * Word-level modifier system with context menu.
  */
 
@@ -27,6 +27,13 @@ const MODIFIERS = {
 
 const MOD_ORDER = ['pause', 'accent', 'sayas'];
 
+// Color mapping per modifier type (from Figma tokens)
+const MOD_COLORS = {
+  pause: [249, 115, 22],   // #f97316 — tag/warning/tag-orange-icon
+  accent: [192, 132, 252],  // #c084fc — tag/purple/tag-purple-icon
+  sayas: [59, 130, 246],    // #3b82f6 — tag/blue/tag-blue-icon
+};
+
 // ============================================
 // DOM References
 // ============================================
@@ -49,6 +56,9 @@ const SUB_MAP = { accent: $subTone, sayas: $subSayAs };
 
 let savedSelection = null;
 let targetModifierWord = null;
+let ignoreInput = false;
+const slideTextDirty = {};
+const slideModsSnapshot = {};
 
 // ============================================
 // SVG Templates
@@ -72,6 +82,12 @@ function findEditorFromNode(node) {
   if (!node) return null;
   if (node.nodeType === Node.TEXT_NODE) node = node.parentElement;
   return node ? node.closest('.te') : null;
+}
+
+function findSlideCard(node) {
+  if (!node) return null;
+  if (node.nodeType === Node.TEXT_NODE) node = node.parentElement;
+  return node ? node.closest('.slide-card') : null;
 }
 
 // ============================================
@@ -196,12 +212,15 @@ function createModifierWord(text, mods) {
 }
 
 function renderModifierWordContent(el, text, mods) {
-  const counter = document.createElement('span');
-  counter.className = 'mw-count';
-  counter.textContent = mods.length;
-  el.appendChild(counter);
-
   el.appendChild(document.createTextNode(text));
+
+  // Underline bar (supports gradient for multi-modifier)
+  const line = document.createElement('span');
+  line.className = 'mw-line';
+  el.appendChild(line);
+
+  // Apply dynamic colors based on active modifier types
+  applyModifierColors(el, mods);
 
   el.dataset.tip = mods
     .map((m) => {
@@ -210,6 +229,32 @@ function renderModifierWordContent(el, text, mods) {
       return val && val !== 'On' ? `${label}: ${val}` : label;
     })
     .join(' \u00B7 ');
+}
+
+/** Set background tint and underline color(s) on a modifier word element. */
+function applyModifierColors(el, mods) {
+  // Collect unique colors in MOD_ORDER to keep gradient consistent
+  const colors = [];
+  for (const type of MOD_ORDER) {
+    if (mods.some((m) => m.type === type) && MOD_COLORS[type]) {
+      colors.push(MOD_COLORS[type]);
+    }
+  }
+
+  if (colors.length === 0) return;
+
+  const line = el.querySelector('.mw-line');
+
+  if (colors.length === 1) {
+    const [r, g, b] = colors[0];
+    el.style.background = `rgba(${r},${g},${b},0.15)`;
+    if (line) line.style.background = `rgb(${r},${g},${b})`;
+  } else {
+    const bgStops = colors.map(([r, g, b]) => `rgba(${r},${g},${b},0.15)`).join(', ');
+    const lineStops = colors.map(([r, g, b]) => `rgb(${r},${g},${b})`).join(', ');
+    el.style.background = `linear-gradient(to right, ${bgStops})`;
+    if (line) line.style.background = `linear-gradient(to right, ${lineStops})`;
+  }
 }
 
 function refreshModifierWord(mwEl) {
@@ -241,8 +286,12 @@ function applyModifier(type, value, badge) {
     if (idx >= 0) mods[idx] = mod;
     else mods.push(mod);
 
+    ignoreInput = true;
     targetModifierWord.dataset.mods = JSON.stringify(mods);
     refreshModifierWord(targetModifierWord);
+    ignoreInput = false;
+
+    updateSlideFromContent(findSlideCard(targetModifierWord));
     closeSubPanels();
     buildMainPanel(getWordText(targetModifierWord), targetModifierWord);
     return;
@@ -254,16 +303,18 @@ function applyModifier(type, value, badge) {
   const mod = { type, value };
   if (badge) mod.badge = badge;
 
+  ignoreInput = true;
   const mwEl = createModifierWord(text, [mod]);
   range.deleteContents();
   range.insertNode(mwEl);
 
-  const next = mwEl.nextSibling;
-  if (!next || (next.nodeType === Node.TEXT_NODE && !next.textContent.startsWith(' '))) {
+  if (!mwEl.nextSibling) {
     mwEl.after(document.createTextNode('\u00A0'));
   }
+  ignoreInput = false;
 
   window.getSelection().removeAllRanges();
+  updateSlideFromContent(findSlideCard(mwEl));
   targetModifierWord = mwEl;
   savedSelection = { existingEl: mwEl, text: getWordText(mwEl) };
   closeSubPanels();
@@ -325,11 +376,14 @@ $panelMain.addEventListener('click', (e) => {
     const idx = mods.findIndex((m) => m.type === type);
     if (idx >= 0) mods.splice(idx, 1);
 
+    const card = findSlideCard(targetModifierWord);
+
+    ignoreInput = true;
     targetModifierWord.dataset.mods = JSON.stringify(mods);
     refreshModifierWord(targetModifierWord);
+    ignoreInput = false;
 
     if (mods.length === 0) {
-      // Word unwrapped — keep menu open but clear target
       closeSubPanels();
       savedSelection = null;
       targetModifierWord = null;
@@ -338,6 +392,8 @@ $panelMain.addEventListener('click', (e) => {
       closeSubPanels();
       buildMainPanel(getWordText(targetModifierWord), targetModifierWord);
     }
+
+    updateSlideFromContent(card);
     return;
   }
 
@@ -430,3 +486,153 @@ for (const tab of document.querySelectorAll('.tab')) {
     resetMenuState();
   });
 }
+
+// ============================================
+// Slide State Management
+// ============================================
+
+const SVG_PLAY = '<svg viewBox="0 0 16 16"><path d="M5.3 3.3l6.7 4.7-6.7 4.7V3.3z" fill="currentColor" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const SVG_DOTS = '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/><circle cx="12.67" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/><circle cx="3.33" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/></svg>';
+const SVG_GENERATE = '<svg viewBox="0 0 16 16"><path d="M6.2 13.1V10.4l1.3.1a1.6 1.6 0 0 0 1.4-1.4V5.3A3.6 3.6 0 0 0 5.3 1.7 3.6 3.6 0 0 0 1.7 5.3c0 1.9.4 2 .7 3 .2.6.2 1.2 0 1.8L1.7 13.1" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M13.5 11.6a6.7 6.7 0 0 0 0-9M11.7 9.8a3.3 3.3 0 0 0 0-4.7" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+const SVG_REGENERATE = '<svg viewBox="0 0 16 16"><path d="M1.3 8a6.7 6.7 0 0 1 11.5-4.7L14 4.7M14 1.3v3.4h-3.3M14.7 8a6.7 6.7 0 0 1-11.5 4.7L2 11.3M2 14.7v-3.4h3.3" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+
+function setSlideState(card, state) {
+  if (card.dataset.state === state) return;
+  card.dataset.state = state;
+
+  const badges = card.querySelector('.slide-badges');
+  const actions = card.querySelector('.slide-actions');
+  const time = card.dataset.time || '0:00';
+
+  // Update badges
+  const warnBadge = badges.querySelector('.badge-warning');
+  const errBadge = badges.querySelector('.badge-error');
+
+  if (state === 'text-changed') {
+    if (errBadge) errBadge.remove();
+    if (!warnBadge) {
+      const b = document.createElement('span');
+      b.className = 'badge badge-warning';
+      b.textContent = 'Text changed';
+      badges.appendChild(b);
+    }
+  } else if (state === 'has-audio') {
+    if (warnBadge) warnBadge.remove();
+    if (errBadge) errBadge.remove();
+  }
+
+  // Update actions
+  if (state === 'has-audio') {
+    actions.innerHTML =
+      `<button class="btn-icon btn-play">${SVG_PLAY}</button>` +
+      `<div class="slide-time"><span class="time-current">0:00</span><span class="time-sep">/</span><span class="time-total">${time}</span></div>` +
+      `<div class="separator-v"></div>` +
+      `<button class="btn-icon">${SVG_DOTS}</button>`;
+  } else if (state === 'text-changed') {
+    actions.innerHTML =
+      `<button class="btn-ghost">${SVG_REGENERATE} Regenerate Audio</button>` +
+      `<div class="separator-v"></div>` +
+      `<button class="btn-icon">${SVG_DOTS}</button>`;
+  }
+}
+
+/** Serialize current modifier state of a slide for comparison. */
+function getModifierSnapshot(card) {
+  const te = card.querySelector('.te');
+  if (!te) return '';
+  const mws = [...te.querySelectorAll('.mw')];
+  return mws.map((mw) => getWordText(mw) + ':' + (mw.dataset.mods || '[]')).join('|');
+}
+
+/** Re-evaluate slide state based on modifiers + manual edits. */
+function updateSlideFromContent(card) {
+  if (!card || card.dataset.state === 'no-audio') return;
+
+  const slideId = card.dataset.slide;
+  const dirty = slideTextDirty[slideId] || false;
+  const currentSnap = getModifierSnapshot(card);
+  const savedSnap = slideModsSnapshot[slideId] || '';
+  const modsChanged = currentSnap !== savedSnap;
+
+  if (dirty || modsChanged) {
+    if (card.dataset.state !== 'text-changed') {
+      setSlideState(card, 'text-changed');
+    }
+  } else {
+    if (card.dataset.state === 'text-changed') {
+      setSlideState(card, 'has-audio');
+    }
+  }
+}
+
+// ============================================
+// Event: Manual Text Editing → Text Changed
+// ============================================
+
+$slidesArea.addEventListener('input', (e) => {
+  if (ignoreInput) return;
+  const te = e.target.closest('.te');
+  if (!te) return;
+  const card = te.closest('.slide-card');
+  if (!card || card.dataset.state === 'no-audio') return;
+
+  slideTextDirty[card.dataset.slide] = true;
+  updateSlideFromContent(card);
+});
+
+// ============================================
+// Event: Generate Audio / Regenerate Audio
+// ============================================
+
+$slidesArea.addEventListener('click', (e) => {
+  const ghost = e.target.closest('.btn-ghost');
+  if (!ghost) return;
+  const card = ghost.closest('.slide-card');
+  if (!card) return;
+
+  if (card.dataset.state === 'no-audio' || card.dataset.state === 'text-changed') {
+    const slideId = card.dataset.slide;
+    slideTextDirty[slideId] = false;
+    setSlideState(card, 'has-audio');
+    slideModsSnapshot[slideId] = getModifierSnapshot(card);
+  }
+});
+
+// ============================================
+// Init: Pre-apply Tone modifier on Slide 3
+// ============================================
+
+(function initPresetModifiers() {
+  const te = document.querySelector('[data-slide="3"] .te');
+  if (!te) return;
+
+  const walker = document.createTreeWalker(te, NodeFilter.SHOW_TEXT);
+  let node;
+  while ((node = walker.nextNode())) {
+    const idx = node.textContent.indexOf('architecture');
+    if (idx < 0) continue;
+
+    ignoreInput = true;
+    const range = document.createRange();
+    range.setStart(node, idx);
+    range.setEnd(node, idx + 'architecture'.length);
+
+    const mwEl = createModifierWord('architecture', [
+      { type: 'accent', value: 'Strong', badge: 'Strong' },
+    ]);
+    range.deleteContents();
+    range.insertNode(mwEl);
+    ignoreInput = false;
+    break;
+  }
+})();
+
+// ============================================
+// Init: Snapshot has-audio slides
+// ============================================
+
+(function initSnapshots() {
+  for (const card of document.querySelectorAll('.slide-card[data-state="has-audio"]')) {
+    slideModsSnapshot[card.dataset.slide] = getModifierSnapshot(card);
+  }
+})();
