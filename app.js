@@ -333,10 +333,20 @@ $slidesArea.addEventListener('mouseup', (e) => {
   if (!editor.contains(sel.anchorNode) || !editor.contains(sel.focusNode)) return;
   if (/\s/.test(text)) return;
 
-  savedSelection = { range: sel.getRangeAt(0).cloneRange(), text };
+  // Only allow full-word selections — check chars before and after
+  const range = sel.getRangeAt(0);
+  const parentText = range.startContainer.textContent || '';
+  const charBefore = parentText[range.startOffset - 1] || '';
+  const endText = range.endContainer.textContent || '';
+  const charAfter = endText[range.endOffset] || '';
+  const wordBoundary = /^[\s.,;:!?'"()\-–—\u00A0]*$/;
+  if (charBefore && !wordBoundary.test(charBefore)) return;
+  if (charAfter && !wordBoundary.test(charAfter)) return;
+
+  savedSelection = { range: range.cloneRange(), text };
   targetModifierWord = null;
 
-  const rect = sel.getRangeAt(0).getBoundingClientRect();
+  const rect = range.getBoundingClientRect();
   openMenu(rect.left, rect.bottom + 8, text, null);
 });
 
