@@ -706,9 +706,6 @@ body {
 }
 
 /* Button press effect */
-.btn-ghost:active {
-  transform: scale(0.97);
-}
 
 /* Tab switch */
 .tab {
