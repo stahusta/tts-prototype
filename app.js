@@ -401,7 +401,7 @@ $panelMain.addEventListener('click', (e) => {
   } else if (type === 'sayas') {
     openSubPanel($subSayAs);
     $saInput.value = '';
-    setTimeout(() => $saInput.focus(), 60);
+    $btnSaApply.classList.add('hidden');
   }
 });
 
@@ -450,7 +450,11 @@ $saInput.addEventListener('input', () => {
 // Event: Prevent Selection Loss on Menu Click
 // ============================================
 
-$ctxWrap.addEventListener('mousedown', (e) => e.preventDefault());
+$ctxWrap.addEventListener('mousedown', (e) => {
+  // Allow focus on the Say As input, prevent elsewhere to keep text selection
+  if (e.target === $saInput) return;
+  e.preventDefault();
+});
 
 // ============================================
 // Event: Close Menu on Outside Click / Escape
