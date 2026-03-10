@@ -564,6 +564,20 @@ function updateSlideFromContent(card) {
 // Event: Manual Text Editing → Text Changed
 // ============================================
 
+// Capture original HTML BEFORE any edits happen
+$slidesArea.addEventListener('beforeinput', (e) => {
+  if (ignoreInput) return;
+  const te = e.target.closest('.te');
+  if (!te) return;
+  const card = te.closest('.slide-card');
+  if (!card || card.dataset.state === 'no-audio') return;
+  const slideId = card.dataset.slide;
+  // Snapshot original content before first manual edit
+  if (!slideOriginalHTML[slideId]) {
+    slideOriginalHTML[slideId] = te.innerHTML;
+  }
+});
+
 $slidesArea.addEventListener('input', (e) => {
   if (ignoreInput) return;
   const te = e.target.closest('.te');
@@ -578,9 +592,6 @@ $slidesArea.addEventListener('input', (e) => {
   // Hide sources and show toast on first manual edit
   const sources = card.querySelector('.slide-sources');
   if (sources && sources.style.display !== 'none') {
-    if (!slideOriginalHTML[slideId]) {
-      slideOriginalHTML[slideId] = te.innerHTML;
-    }
     sources.style.display = 'none';
     showToast(card);
   }
