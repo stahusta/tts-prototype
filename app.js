@@ -155,11 +155,9 @@ function buildMainPanel(word, mwEl) {
     const type = item.dataset.action;
     const activeMod = modsByType[type];
 
-    // Remove old val/remove elements
-    const oldVal = item.querySelector('.ctx-v2-val');
-    const oldRemove = item.querySelector('.ctx-v2-remove');
-    if (oldVal) oldVal.remove();
-    if (oldRemove) oldRemove.remove();
+    // Remove old actions group
+    const oldActions = item.querySelector('.ctx-v2-actions');
+    if (oldActions) oldActions.remove();
 
     // Show/hide chevron
     const chevron = item.querySelector('.ctx-v2-chevron');
@@ -168,16 +166,25 @@ function buildMainPanel(word, mwEl) {
       const displayValue = activeMod.badge || activeMod.value;
       if (chevron) chevron.style.display = 'none';
 
+      const actionsEl = document.createElement('span');
+      actionsEl.className = 'ctx-v2-actions';
+
       const valEl = document.createElement('span');
       valEl.className = 'ctx-v2-val';
-      valEl.textContent = displayValue;
-      item.appendChild(valEl);
+
+      const valText = document.createElement('span');
+      valText.className = 'ctx-v2-val-text';
+      valText.textContent = displayValue;
+      valEl.appendChild(valText);
 
       const removeEl = document.createElement('button');
       removeEl.className = 'ctx-v2-remove';
       removeEl.dataset.remove = type;
       removeEl.innerHTML = ICON_CLOSE;
-      item.appendChild(removeEl);
+      valEl.appendChild(removeEl);
+
+      actionsEl.appendChild(valEl);
+      item.appendChild(actionsEl);
     } else {
       if (chevron) chevron.style.display = '';
     }
