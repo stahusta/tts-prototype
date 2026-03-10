@@ -455,6 +455,7 @@ body {
 .ctx-v2-chevron {
   display: flex;
   align-items: center;
+  margin-left: auto;
 }
 
 .ctx-v2-chevron svg {
