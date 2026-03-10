@@ -573,8 +573,7 @@ body {
    Sub-panel: Say As
    ============================================ */
 #subSayAs {
-  width: 291px;
-  min-width: 291px;
+  width: max-content;
 }
 
 .sa-section-label {
@@ -589,7 +588,7 @@ body {
 .sa-lang-grid {
   display: flex;
   gap: 8px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   padding: 8px 12px;
 }
 
