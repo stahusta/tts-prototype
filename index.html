@@ -11,61 +11,177 @@
 <body>
 
 <div class="app">
-  <!-- Version Switch -->
+  <!-- Segmented Control -->
   <div class="tabs">
     <div class="tabs-bar">
-      <button class="tab active" data-version="v1">
-        Version 1
+      <button class="tab">
+        <svg viewBox="0 0 16 16"><path d="M2 4h10M2 8h12M2 12h7" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" fill="none"/></svg>
+        Preview
       </button>
-      <button class="tab" data-version="v2">
-        Version 2
+      <button class="tab active">
+        <svg viewBox="0 0 16 16"><path d="M8 1.3L1.3 4.3 8 7.3l6.7-3L8 1.3z" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M1.3 8l6.7 3 6.7-3M1.3 11.3l6.7 3 6.7-3" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        Scenario
       </button>
     </div>
   </div>
 
-  <!-- Slide Editor -->
-  <div class="content-area">
-    <div class="card" id="cardSlides">
-      <div class="slide">
-        <span class="slide-badge">Slide 1</span>
-        <div class="te" contenteditable="true" spellcheck="false">Germany, a country full of history, culture, and breathtaking landscapes. In this video, we will explore the ten most popular places worth visiting during a trip to this fascinating country.</div>
+  <!-- Slides -->
+  <div class="content-area" id="slidesArea">
+
+    <!-- Slide 1: No audio -->
+    <div class="slide-card" data-slide="1" data-state="no-audio">
+      <div class="slide-top">
+        <div class="slide-badges">
+          <span class="badge badge-white">Slide 1</span>
+          <span class="badge badge-error">No voiceover audio</span>
+        </div>
+        <div class="slide-actions">
+          <button class="btn-ghost">
+            <svg viewBox="0 0 16 16"><path d="M6.2 13.1V10.4l1.3.1a1.6 1.6 0 0 0 1.4-1.4V5.3A3.6 3.6 0 0 0 5.3 1.7 3.6 3.6 0 0 0 1.7 5.3c0 1.9.4 2 .7 3 .2.6.2 1.2 0 1.8L1.7 13.1" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M13.5 11.6a6.7 6.7 0 0 0 0-9M11.7 9.8a3.3 3.3 0 0 0 0-4.7" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+            Generate Audio
+          </button>
+          <div class="separator-v"></div>
+          <button class="btn-icon">
+            <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/><circle cx="12.67" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/><circle cx="3.33" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/></svg>
+          </button>
+        </div>
       </div>
-      <div class="slide">
-        <span class="slide-badge">Slide 2</span>
-        <div class="te" contenteditable="true" spellcheck="false">Neuschwanstein Castle, located in Bavaria, is one of the most recognizable castles in the world. It even inspired Walt Disney to create the Sleeping Beauty Castle.</div>
+      <div class="slide-body">
+        <div class="slide-te te" contenteditable="true" spellcheck="false">Germany, a country full of history, culture, and breathtaking landscapes. In this video, we will explore the ten most popular places worth visiting during a trip to this fascinating country.</div>
       </div>
-      <div class="slide">
-        <span class="slide-badge">Slide 3</span>
-        <div class="te" contenteditable="true" spellcheck="false">The Cologne Cathedral is a masterpiece of Gothic architecture. Its impressive towers dominate the city's skyline.</div>
-      </div>
-      <div class="slide">
-        <span class="slide-badge">Slide 4</span>
-        <div class="te" contenteditable="true" spellcheck="false">The Cologne Cathedral is a masterpiece of Gothic architecture. Its impressive towers dominate the city's skyline.</div>
-      </div>
-      <div class="slide">
-        <span class="slide-badge">Slide 5</span>
-        <div class="te" contenteditable="true" spellcheck="false">The Brandenburg Gate, an 18th-century neoclassical monument, symbolizes unity and peace in Berlin. Its stunning architecture and rich history make it a must-see attraction for visitors.</div>
-      </div>
-      <button class="btn-generate">
-        <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
-        Generate all voiceover
-      </button>
     </div>
+
+    <!-- Slide 2: Has audio -->
+    <div class="slide-card" data-slide="2" data-state="has-audio">
+      <div class="slide-top">
+        <div class="slide-badges">
+          <span class="badge badge-white">Slide 2</span>
+        </div>
+        <div class="slide-actions">
+          <button class="btn-icon btn-play">
+            <svg viewBox="0 0 16 16"><path d="M5.3 3.3l6.7 4.7-6.7 4.7V3.3z" fill="currentColor" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="slide-time">
+            <span class="time-current">0:00</span>
+            <span class="time-sep">/</span>
+            <span class="time-total">0:13</span>
+          </div>
+          <div class="separator-v"></div>
+          <button class="btn-icon">
+            <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/><circle cx="12.67" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/><circle cx="3.33" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="slide-te te" contenteditable="true" spellcheck="false">Neuschwanstein Castle, located in Bavaria, is one of the most recognizable castles in the world. It even inspired Walt Disney to create the Sleeping Beauty Castle.</div>
+      </div>
+    </div>
+
+    <!-- Slide 3: Text changed -->
+    <div class="slide-card" data-slide="3" data-state="text-changed">
+      <div class="slide-top">
+        <div class="slide-badges">
+          <span class="badge badge-white">Slide 3</span>
+          <span class="badge badge-warning">Text changed</span>
+        </div>
+        <div class="slide-actions">
+          <button class="btn-ghost">
+            <svg viewBox="0 0 16 16"><path d="M1.3 8a6.7 6.7 0 0 1 11.5-4.7L14 4.7M14 1.3v3.4h-3.3M14.7 8a6.7 6.7 0 0 1-11.5 4.7L2 11.3M2 14.7v-3.4h3.3" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+            Regenerate Audio
+          </button>
+          <div class="separator-v"></div>
+          <button class="btn-icon">
+            <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/><circle cx="12.67" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/><circle cx="3.33" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="slide-te te" contenteditable="true" spellcheck="false">The Cologne Cathedral is a masterpiece of Gothic architecture. Its impressive towers dominate the city's skyline.</div>
+      </div>
+    </div>
+
+    <!-- Slide 4: Has audio -->
+    <div class="slide-card" data-slide="4" data-state="has-audio">
+      <div class="slide-top">
+        <div class="slide-badges">
+          <span class="badge badge-white">Slide 4</span>
+        </div>
+        <div class="slide-actions">
+          <button class="btn-icon btn-play">
+            <svg viewBox="0 0 16 16"><path d="M5.3 3.3l6.7 4.7-6.7 4.7V3.3z" fill="currentColor" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="slide-time">
+            <span class="time-current">0:00</span>
+            <span class="time-sep">/</span>
+            <span class="time-total">0:09</span>
+          </div>
+          <div class="separator-v"></div>
+          <button class="btn-icon">
+            <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/><circle cx="12.67" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/><circle cx="3.33" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="slide-te te" contenteditable="true" spellcheck="false">The Cologne Cathedral is a masterpiece of Gothic architecture. Its impressive towers dominate the city's skyline.</div>
+      </div>
+    </div>
+
+    <!-- Slide 5: Has audio -->
+    <div class="slide-card" data-slide="5" data-state="has-audio">
+      <div class="slide-top">
+        <div class="slide-badges">
+          <span class="badge badge-white">Slide 5</span>
+        </div>
+        <div class="slide-actions">
+          <button class="btn-icon btn-play">
+            <svg viewBox="0 0 16 16"><path d="M5.3 3.3l6.7 4.7-6.7 4.7V3.3z" fill="currentColor" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="slide-time">
+            <span class="time-current">0:00</span>
+            <span class="time-sep">/</span>
+            <span class="time-total">0:10</span>
+          </div>
+          <div class="separator-v"></div>
+          <button class="btn-icon">
+            <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/><circle cx="12.67" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/><circle cx="3.33" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="slide-te te" contenteditable="true" spellcheck="false">The Brandenburg Gate, an 18th-century neoclassical monument, symbolizes unity and peace in Berlin. Its stunning architecture and rich history make it a must-see attraction for visitors.</div>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<!-- Context Menu (Cascading) -->
+<!-- Context Menu -->
 <div class="ctx-wrap" id="ctxWrap">
-  <div class="ctx-panel" id="panelMain"></div>
+  <div class="ctx-panel ctx-v2" id="panelMain">
+    <div class="ctx-v2-group-label" id="menuWordLabel">Edit word</div>
+    <button class="ctx-v2-item" data-action="pause">
+      <svg class="ctx-v2-icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+      <span class="ctx-v2-label">Pause</span>
+    </button>
+    <button class="ctx-v2-item has-sub" data-action="accent">
+      <svg class="ctx-v2-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+      <span class="ctx-v2-label">Tone</span>
+      <span class="ctx-v2-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+    </button>
+    <button class="ctx-v2-item has-sub" data-action="sayas">
+      <svg class="ctx-v2-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M7 8h5"/><path d="M7 12h10"/></svg>
+      <span class="ctx-v2-label">Say As</span>
+      <span class="ctx-v2-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+    </button>
+  </div>
 
-  <!-- Sub-panel: Emphasis -->
-  <div class="ctx-panel sub" id="subAccent" style="display: none">
+  <!-- Sub-panel: Tone -->
+  <div class="ctx-panel sub" id="subTone" style="display: none">
     <div class="ctx-hd">Choose tone</div>
-    <div class="ctx-sep"></div>
-    <button class="a-item" data-acc="strong" data-acc-l="Strong"><span class="a-flag">💪</span>Strong</button>
-    <button class="a-item" data-acc="soft" data-acc-l="Soft"><span class="a-flag">🤫</span>Soft</button>
-    <button class="a-item" data-acc="questioning" data-acc-l="Questioning"><span class="a-flag">❓</span>Questioning</button>
-    <button class="a-item" data-acc="emotional" data-acc-l="Emotional"><span class="a-flag">🎭</span>Emotional</button>
+    <button class="a-item" data-tone="strong" data-tone-l="Strong"><span class="a-flag">💪</span>Strong</button>
+    <button class="a-item" data-tone="soft" data-tone-l="Soft"><span class="a-flag">🤫</span>Soft</button>
+    <button class="a-item" data-tone="questioning" data-tone-l="Questioning"><span class="a-flag">❓</span>Questioning</button>
+    <button class="a-item" data-tone="emotional" data-tone-l="Emotional"><span class="a-flag">🎭</span>Emotional</button>
   </div>
 
   <!-- Sub-panel: Say As -->
@@ -83,57 +199,6 @@
     <div class="sa-form">
       <input class="sa-input" id="saInput" type="text" placeholder="Type how to pronounce...">
       <button class="btn-apply" id="btnSaApply">
-        <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
-        Apply
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Context Menu V2 (shadcn-style) -->
-<div class="ctx-wrap" id="ctxWrapV2">
-  <div class="ctx-panel ctx-v2" id="panelV2">
-    <div class="ctx-v2-group-label" id="v2WordLabel">Edit word</div>
-    <button class="ctx-v2-item" data-v2action="pause">
-      <svg class="ctx-v2-icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
-      <span class="ctx-v2-label">Pause</span>
-    </button>
-    <button class="ctx-v2-item has-sub" id="v2AccentTrigger" data-v2action="accent">
-      <svg class="ctx-v2-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-      <span class="ctx-v2-label">Tone</span>
-      <span class="ctx-v2-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
-    </button>
-    <button class="ctx-v2-item has-sub" id="v2SayAsTrigger" data-v2action="sayas">
-      <svg class="ctx-v2-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M7 8h5"/><path d="M7 12h10"/></svg>
-      <span class="ctx-v2-label">Say As</span>
-      <span class="ctx-v2-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
-    </button>
-  </div>
-
-  <!-- Sub-panel: Emphasis (V1-style) -->
-  <div class="ctx-panel sub" id="subAccentV2" style="display: none">
-    <div class="ctx-hd">Choose tone</div>
-    <button class="a-item" data-v2acc="strong" data-v2acc-l="Strong"><span class="a-flag">💪</span>Strong</button>
-    <button class="a-item" data-v2acc="soft" data-v2acc-l="Soft"><span class="a-flag">🤫</span>Soft</button>
-    <button class="a-item" data-v2acc="questioning" data-v2acc-l="Questioning"><span class="a-flag">❓</span>Questioning</button>
-    <button class="a-item" data-v2acc="emotional" data-v2acc-l="Emotional"><span class="a-flag">🎭</span>Emotional</button>
-  </div>
-
-  <!-- Sub-panel: Say As (V1-style) -->
-  <div class="ctx-panel sub" id="subSayAsV2" style="display: none">
-    <div class="sa-section-label">Choose language</div>
-    <div class="sa-lang-grid">
-      <button class="sa-lang" data-v2sal="PL">🇵🇱 PL</button>
-      <button class="sa-lang" data-v2sal="EN">🇬🇧 EN</button>
-      <button class="sa-lang" data-v2sal="FR">🇫🇷 FR</button>
-      <button class="sa-lang" data-v2sal="DE">🇩🇪 DE</button>
-      <button class="sa-lang" data-v2sal="ES">🇪🇸 ES</button>
-      <button class="sa-lang" data-v2sal="IT">🇮🇹 IT</button>
-    </div>
-    <div class="sa-section-label">Or type your own</div>
-    <div class="sa-form">
-      <input class="sa-input" id="saInputV2" type="text" placeholder="Type how to pronounce...">
-      <button class="btn-apply" id="btnSaApplyV2">
         <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
         Apply
       </button>
