@@ -11,7 +11,7 @@ const MODIFIERS = {
   pause: {
     label: 'Pause',
     desc: 'Insert pause after word',
-    icon: '<line x1="10" y1="4" x2="10" y2="20"/><line x1="14" y1="4" x2="14" y2="20"/>',
+    icon: '<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>',
   },
   accent: {
     label: 'Accent',
@@ -21,7 +21,7 @@ const MODIFIERS = {
   sayas: {
     label: 'Say As',
     desc: 'Alternative pronunciation',
-    icon: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M7 9h10"/><path d="M7 13h6"/>',
+    icon: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M7 8h5"/><path d="M7 12h10"/>',
   },
 };
 
@@ -414,12 +414,15 @@ $ctxWrap.addEventListener('mousedown', (e) => e.preventDefault());
 // ============================================
 
 document.addEventListener('mousedown', (e) => {
-  if ($ctxWrap.contains(e.target)) return;
-  if ($ctxWrap.classList.contains('visible')) resetMenuState();
+  if (!$ctxWrap.contains(e.target) && $ctxWrap.classList.contains('visible')) resetMenuState();
+  if (!$ctxWrapV2.contains(e.target) && $ctxWrapV2.classList.contains('visible')) hideV2Menu();
 });
 
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') resetMenuState();
+  if (e.key === 'Escape') {
+    resetMenuState();
+    if ($ctxWrapV2.classList.contains('visible')) hideV2Menu();
+  }
 });
 
 // ============================================
@@ -497,12 +500,10 @@ function buildV2MainPanel(word, mwEl) {
 
     // Show/hide chevron
     const chevron = item.querySelector('.ctx-v2-chevron');
-    const shortcut = item.querySelector('.ctx-v2-shortcut');
 
     if (activeMod) {
       const displayValue = activeMod.badge || activeMod.value;
       if (chevron) chevron.style.display = 'none';
-      if (shortcut) shortcut.style.display = 'none';
 
       const valEl = document.createElement('span');
       valEl.className = 'ctx-v2-val';
@@ -516,7 +517,6 @@ function buildV2MainPanel(word, mwEl) {
       item.appendChild(removeEl);
     } else {
       if (chevron) chevron.style.display = '';
-      if (shortcut) shortcut.style.display = '';
     }
   }
 }
@@ -542,11 +542,6 @@ function openV2SubPanel(panel) {
     panel.classList.add('vis');
     adjustV2Position();
   });
-}
-
-// V2: Apply modifier (reuses V1's applyModifier function)
-function applyV2Modifier(type, value, badge) {
-  applyModifier(type, value, badge);
 }
 
 // V2: Open on word selection
@@ -617,7 +612,7 @@ $panelV2.addEventListener('click', (e) => {
   const type = item.dataset.v2action;
 
   if (type === 'pause') {
-    applyV2Modifier('pause', 'On');
+    applyModifier('pause', 'On');
     hideV2Menu();
     return;
   }
@@ -635,7 +630,7 @@ $panelV2.addEventListener('click', (e) => {
 $subAccentV2.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-v2acc]');
   if (btn && savedSelection) {
-    applyV2Modifier('accent', btn.dataset.v2accL, btn.dataset.v2acc);
+    applyModifier('accent', btn.dataset.v2accL, btn.dataset.v2acc);
     hideV2Menu();
   }
 });
@@ -644,7 +639,7 @@ $subAccentV2.addEventListener('click', (e) => {
 $subSayAsV2.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-v2sal]');
   if (btn && savedSelection) {
-    applyV2Modifier('sayas', 'lang:' + btn.dataset.v2sal, btn.textContent.trim());
+    applyModifier('sayas', 'lang:' + btn.dataset.v2sal, btn.textContent.trim());
     hideV2Menu();
   }
 });
@@ -653,7 +648,7 @@ $subSayAsV2.addEventListener('click', (e) => {
 $btnSaApplyV2.addEventListener('click', () => {
   const value = $saInputV2.value.trim();
   if (value && savedSelection) {
-    applyV2Modifier('sayas', value);
+    applyModifier('sayas', value);
     hideV2Menu();
   }
 });
@@ -665,16 +660,5 @@ $saInputV2.addEventListener('keydown', (e) => {
   }
 });
 
-// V2: Close on outside click
-document.addEventListener('mousedown', (e) => {
-  if ($ctxWrapV2.contains(e.target)) return;
-  if ($ctxWrapV2.classList.contains('visible')) hideV2Menu();
-});
-
 // V2: Prevent selection loss
 $ctxWrapV2.addEventListener('mousedown', (e) => e.preventDefault());
-
-// V2: Close on escape
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && $ctxWrapV2.classList.contains('visible')) hideV2Menu();
-});
