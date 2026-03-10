@@ -481,6 +481,7 @@ body {
   white-space: nowrap;
   pointer-events: none;
   z-index: 10;
+  animation: tooltip-in 0.15s ease-out;
 }
 
 .mw[data-tip]:hover::before {
@@ -493,6 +494,7 @@ body {
   border-top-color: #18181b;
   pointer-events: none;
   z-index: 10;
+  animation: tooltip-in 0.15s ease-out;
 }
 
 /* ============================================
@@ -521,7 +523,6 @@ body {
     0 0 0 1px rgba(24, 24, 27, 0.08),
     0 4px 8px rgba(24, 24, 27, 0.08),
     0 8px 16px rgba(24, 24, 27, 0.08);
-  width: 220px;
   padding-bottom: 4px;
   opacity: 0;
   transform: translateX(-4px) scale(0.97);
@@ -856,14 +857,6 @@ body {
 @keyframes tooltip-in {
   from { opacity: 0; transform: translateX(-50%) translateY(4px); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
-}
-
-.mw[data-tip]:hover::after {
-  animation: tooltip-in 0.15s ease-out;
-}
-
-.mw[data-tip]:hover::before {
-  animation: tooltip-in 0.15s ease-out;
 }
 
 /* Reduce motion for accessibility */
