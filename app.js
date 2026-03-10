@@ -8,21 +8,9 @@
 // ============================================
 
 const MODIFIERS = {
-  pause: {
-    label: 'Pause',
-    desc: 'Insert pause after word',
-    icon: '<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>',
-  },
-  accent: {
-    label: 'Tone',
-    desc: 'Speech delivery style',
-    icon: '<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>',
-  },
-  sayas: {
-    label: 'Say As',
-    desc: 'Alternative pronunciation',
-    icon: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M7 8h5"/><path d="M7 12h10"/>',
-  },
+  pause: { label: 'Pause' },
+  accent: { label: 'Tone' },
+  sayas: { label: 'Say As' },
 };
 
 const MOD_ORDER = ['pause', 'accent', 'sayas'];
@@ -48,7 +36,6 @@ const $btnSaApply = document.getElementById('btnSaApply');
 const $menuWordLabel = document.getElementById('menuWordLabel');
 
 const SUB_PANELS = [$subTone, $subSayAs];
-const SUB_MAP = { accent: $subTone, sayas: $subSayAs };
 
 // ============================================
 // State
@@ -430,7 +417,7 @@ $panelMain.addEventListener('click', (e) => {
 $subTone.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-tone]');
   if (btn && savedSelection) {
-    applyModifier('accent', btn.dataset.toneL, btn.dataset.tone);
+    applyModifier('accent', btn.dataset.tone, btn.dataset.tone);
   }
 });
 
@@ -500,7 +487,6 @@ for (const tab of document.querySelectorAll('.tab')) {
 
 const SVG_PLAY = '<svg viewBox="0 0 16 16"><path d="M5.3 3.3l6.7 4.7-6.7 4.7V3.3z" fill="currentColor" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const SVG_DOTS = '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/><circle cx="12.67" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/><circle cx="3.33" cy="8" r="0.67" stroke="currentColor" stroke-width="1.33" fill="none"/></svg>';
-const SVG_GENERATE = '<svg viewBox="0 0 16 16"><path d="M6.2 13.1V10.4l1.3.1a1.6 1.6 0 0 0 1.4-1.4V5.3A3.6 3.6 0 0 0 5.3 1.7 3.6 3.6 0 0 0 1.7 5.3c0 1.9.4 2 .7 3 .2.6.2 1.2 0 1.8L1.7 13.1" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M13.5 11.6a6.7 6.7 0 0 0 0-9M11.7 9.8a3.3 3.3 0 0 0 0-4.7" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
 const SVG_REGENERATE = '<svg viewBox="0 0 16 16"><path d="M1.3 8a6.7 6.7 0 0 1 11.5-4.7L14 4.7M14 1.3v3.4h-3.3M14.7 8a6.7 6.7 0 0 1-11.5 4.7L2 11.3M2 14.7v-3.4h3.3" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
 
 function setSlideState(card, state) {
