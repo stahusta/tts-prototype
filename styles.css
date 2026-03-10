@@ -605,8 +605,12 @@ body {
    Context Menu V2 (shadcn-style)
    ============================================ */
 .ctx-v2 {
-  min-width: 220px;
+  width: 214px;
   padding: 4px;
+  box-shadow:
+    0 0 0 1px rgba(24, 24, 27, 0.08),
+    0 4px 8px rgba(24, 24, 27, 0.08),
+    0 8px 16px rgba(24, 24, 27, 0.08);
 }
 
 .ctx-v2-item {
@@ -654,6 +658,7 @@ body {
 .ctx-v2-chevron {
   display: flex;
   align-items: center;
+  margin-left: 8px;
 }
 
 .ctx-v2-chevron svg {
@@ -677,7 +682,7 @@ body {
   font-weight: 500;
   line-height: 16px;
   color: #71717a;
-  padding: 8px;
+  padding: 6px 8px;
 }
 
 /* Flag emoji */
@@ -777,6 +782,7 @@ body {
   background: #fff;
   border: 1px solid #e4e4e7;
   white-space: nowrap;
+  margin-left: 8px;
 }
 
 .ctx-v2-item .ctx-v2-remove {
@@ -806,6 +812,41 @@ body {
   stroke-linecap: round;
   stroke-linejoin: round;
   fill: none;
+}
+
+/* V2 sub-panels — Figma token overrides */
+#subAccentV2,
+#subSayAsV2 {
+  box-shadow:
+    0 0 0 1px rgba(24, 24, 27, 0.08),
+    0 4px 8px rgba(24, 24, 27, 0.08),
+    0 8px 16px rgba(24, 24, 27, 0.08);
+}
+
+#subAccentV2 {
+  width: 160px;
+  min-width: 160px;
+}
+
+#subSayAsV2 {
+  width: 291px;
+  min-width: 291px;
+}
+
+#subAccentV2 .ctx-hd {
+  padding: 6px 12px;
+}
+
+#subSayAsV2 .sa-section-label {
+  padding: 6px 12px;
+}
+
+#subSayAsV2 .sa-lang-grid {
+  padding: 8px 12px;
+}
+
+#subSayAsV2 .sa-form {
+  padding: 8px 12px;
 }
 
 /* ============================================
