@@ -702,21 +702,10 @@ body {
   transition: background 0.15s, color 0.15s, box-shadow 0.2s;
 }
 
-/* V2 menu items stagger */
+/* Menu items — no stagger, just inherit panel animation */
 .ctx-v2-item {
-  opacity: 0;
-  transform: translateY(-4px);
+  transition: background 0.1s;
 }
-
-.ctx-panel.vis .ctx-v2-item {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.15s ease, transform 0.15s ease, background 0.1s;
-}
-
-.ctx-panel.vis .ctx-v2-item:nth-child(2) { transition-delay: 0.02s; }
-.ctx-panel.vis .ctx-v2-item:nth-child(3) { transition-delay: 0.04s; }
-.ctx-panel.vis .ctx-v2-item:nth-child(4) { transition-delay: 0.06s; }
 
 /* Badge/val pop-in */
 .ctx-v2-val {

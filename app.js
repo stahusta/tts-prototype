@@ -243,7 +243,8 @@ function applyModifier(type, value, badge) {
 
     targetModifierWord.dataset.mods = JSON.stringify(mods);
     refreshModifierWord(targetModifierWord);
-    hideMenu();
+    closeSubPanels();
+    buildMainPanel(getWordText(targetModifierWord), targetModifierWord);
     return;
   }
 
@@ -263,9 +264,10 @@ function applyModifier(type, value, badge) {
   }
 
   window.getSelection().removeAllRanges();
-  savedSelection = null;
-  targetModifierWord = null;
-  hideMenu();
+  targetModifierWord = mwEl;
+  savedSelection = { existingEl: mwEl, text: getWordText(mwEl) };
+  closeSubPanels();
+  buildMainPanel(getWordText(mwEl), mwEl);
 }
 
 // ============================================
@@ -327,10 +329,14 @@ $panelMain.addEventListener('click', (e) => {
     refreshModifierWord(targetModifierWord);
 
     if (mods.length === 0) {
-      resetMenuState();
+      // Word unwrapped — keep menu open but clear target
+      closeSubPanels();
+      savedSelection = null;
+      targetModifierWord = null;
+      hideMenu();
     } else {
-      const rect = targetModifierWord.getBoundingClientRect();
-      openMenu(rect.left, rect.bottom + 8, getWordText(targetModifierWord), targetModifierWord);
+      closeSubPanels();
+      buildMainPanel(getWordText(targetModifierWord), targetModifierWord);
     }
     return;
   }
@@ -342,7 +348,6 @@ $panelMain.addEventListener('click', (e) => {
 
   if (type === 'pause') {
     applyModifier('pause', 'On');
-    hideMenu();
     return;
   }
 
@@ -363,7 +368,6 @@ $subTone.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-tone]');
   if (btn && savedSelection) {
     applyModifier('accent', btn.dataset.toneL, btn.dataset.tone);
-    hideMenu();
   }
 });
 
@@ -375,7 +379,6 @@ $subSayAs.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-sal]');
   if (btn && savedSelection) {
     applyModifier('sayas', 'lang:' + btn.dataset.sal, btn.textContent.trim());
-    hideMenu();
   }
 });
 
@@ -383,7 +386,6 @@ $btnSaApply.addEventListener('click', () => {
   const value = $saInput.value.trim();
   if (value && savedSelection) {
     applyModifier('sayas', value);
-    hideMenu();
   }
 });
 
