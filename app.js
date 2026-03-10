@@ -14,7 +14,7 @@ const MODIFIERS = {
     icon: '<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>',
   },
   accent: {
-    label: 'Emphasis',
+    label: 'Tone',
     desc: 'Speech delivery style',
     icon: '<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>',
   },
