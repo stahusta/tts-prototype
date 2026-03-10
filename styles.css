@@ -243,13 +243,14 @@ body {
 
 /* --- Slide Body (Textarea Card) --- */
 .slide-body {
-  padding: 0 4px 4px;
-}
-
-.slide-te {
+  margin: 0 4px 4px;
   background: #fff;
   border: 1px solid #e4e4e7;
   border-radius: 8px;
+  overflow: hidden;
+}
+
+.slide-te {
   padding: 12px;
   font-family: 'Inter', sans-serif;
   font-size: 14px;
@@ -261,6 +262,39 @@ body {
   min-height: 40px;
   word-wrap: break-word;
   overflow-wrap: break-word;
+}
+
+/* Sources row inside text card */
+.slide-sources {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 0 12px 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.sources-label {
+  color: #71717a;
+  white-space: nowrap;
+}
+
+.source-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #e4e4e7;
+  color: #52525b;
+  white-space: nowrap;
+}
+
+.sources-sep {
+  color: #52525b;
 }
 
 .slide-te:empty::before {
