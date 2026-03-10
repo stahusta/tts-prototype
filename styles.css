@@ -588,13 +588,13 @@ body {
 
 .sa-lang-grid {
   display: flex;
-  gap: 6px;
-  flex-wrap: nowrap;
+  gap: 8px;
+  flex-wrap: wrap;
   padding: 8px 12px;
 }
 
 .sa-lang {
-  padding: 4px 6px;
+  padding: 4px 8px;
   border-radius: 6px;
   background: #fafafa;
   box-shadow:
