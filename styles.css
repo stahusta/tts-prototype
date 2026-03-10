@@ -248,10 +248,13 @@ body {
   border: 1px solid #e4e4e7;
   border-radius: 8px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
 }
 
 .slide-te {
-  padding: 12px;
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 400;
@@ -259,7 +262,7 @@ body {
   color: #18181b;
   outline: none;
   cursor: text;
-  min-height: 40px;
+  min-height: 20px;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
@@ -269,7 +272,6 @@ body {
   display: flex;
   gap: 4px;
   align-items: center;
-  padding: 0 12px 12px;
   font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 500;
