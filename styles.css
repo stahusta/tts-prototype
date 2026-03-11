@@ -666,7 +666,6 @@ body {
   align-items: center;
   gap: 8px;
   margin-left: auto;
-  padding-left: 0;
   min-width: 0;
   overflow: hidden;
 }
@@ -786,15 +785,6 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-}
-
-.sa-section-label {
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 16px;
-  color: #71717a;
-  padding: 6px 12px;
 }
 
 .sa-divider {

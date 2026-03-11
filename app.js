@@ -547,7 +547,7 @@ $subPause.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-pause]');
   if (btn && savedSelection) {
     const position = btn.dataset.pause; // "before" or "after"
-    const dur = btn.dataset.dur;        // "0.5" or "1.0"
+    const dur = btn.dataset.dur;        // "0.3" or "0.7"
     const posLabel = position === 'before' ? 'Before' : 'After';
     const durLabel = dur === '0.3' ? 'Short' : 'Long';
     const badge = `${posLabel} · ${durLabel}`;
