@@ -233,6 +233,7 @@
     <button class="ctx-v2-item" data-action="pause">
       <span class="ctx-color-dot"></span>
       <span class="ctx-v2-label">Pause</span>
+      <span class="ctx-v2-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
     </button>
     <button class="ctx-v2-item" data-action="accent">
       <span class="ctx-color-dot"></span>
@@ -244,6 +245,20 @@
       <span class="ctx-v2-label">Say As</span>
       <span class="ctx-v2-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
     </button>
+  </div>
+
+  <!-- Sub-panel: Pause -->
+  <div class="ctx-panel sub" id="subPause" style="display: none">
+    <div class="ctx-hd">Pause before word</div>
+    <div class="pause-options">
+      <button class="a-item" data-pause="before" data-dur="0.5">Short <span class="pause-dur">0.5s</span></button>
+      <button class="a-item" data-pause="before" data-dur="1.0">Long <span class="pause-dur">1.0s</span></button>
+    </div>
+    <div class="ctx-hd">Pause after word</div>
+    <div class="pause-options">
+      <button class="a-item" data-pause="after" data-dur="0.5">Short <span class="pause-dur">0.5s</span></button>
+      <button class="a-item" data-pause="after" data-dur="1.0">Long <span class="pause-dur">1.0s</span></button>
+    </div>
   </div>
 
   <!-- Sub-panel: Tone -->

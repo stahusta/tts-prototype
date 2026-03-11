@@ -29,13 +29,14 @@ const MOD_COLORS = {
 const $slidesArea = document.getElementById('slidesArea');
 const $ctxWrap = document.getElementById('ctxWrap');
 const $panelMain = document.getElementById('panelMain');
+const $subPause = document.getElementById('subPause');
 const $subTone = document.getElementById('subTone');
 const $subSayAs = document.getElementById('subSayAs');
 const $saInput = document.getElementById('saInput');
 const $btnSaApply = document.getElementById('btnSaApply');
 const $menuWordLabel = document.getElementById('menuWordLabel');
 
-const SUB_PANELS = [$subTone, $subSayAs];
+const SUB_PANELS = [$subPause, $subTone, $subSayAs];
 
 // ============================================
 // State
@@ -402,7 +403,7 @@ $panelMain.addEventListener('click', (e) => {
   const type = item.dataset.action;
 
   if (type === 'pause') {
-    applyModifier('pause', 'On');
+    openSubPanel($subPause);
     return;
   }
 
@@ -412,6 +413,21 @@ $panelMain.addEventListener('click', (e) => {
     openSubPanel($subSayAs);
     $saInput.value = '';
     $btnSaApply.classList.add('hidden');
+  }
+});
+
+// ============================================
+// Event: Sub-panel — Pause
+// ============================================
+
+$subPause.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-pause]');
+  if (btn && savedSelection) {
+    const position = btn.dataset.pause; // "before" or "after"
+    const dur = btn.dataset.dur;        // "0.5" or "1.0"
+    const label = position === 'before' ? 'Before' : 'After';
+    const badge = `${label} ${dur}s`;
+    applyModifier('pause', `${position}:${dur}`, badge);
   }
 });
 

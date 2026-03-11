@@ -725,6 +725,17 @@ body {
   background: #f4f4f5;
 }
 
+.pause-dur {
+  margin-left: auto;
+  color: #71717a;
+  font-size: 12px;
+}
+
+.pause-options {
+  display: flex;
+  flex-direction: column;
+}
+
 /* ============================================
    Sub-panel: Say As
    ============================================ */
