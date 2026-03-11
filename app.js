@@ -239,7 +239,6 @@ function createModifierWord(text, mods) {
   const el = document.createElement('span');
   el.className = 'mw';
   el.dataset.mods = JSON.stringify(mods);
-  el.setAttribute('contenteditable', 'false');
   renderModifierWordContent(el, text, mods);
   return el;
 }
@@ -250,6 +249,7 @@ function renderModifierWordContent(el, text, mods) {
   // Underline bar (supports gradient for multi-modifier)
   const line = document.createElement('span');
   line.className = 'mw-line';
+  line.setAttribute('contenteditable', 'false');
   el.appendChild(line);
 
   // Apply dynamic colors based on active modifier types
@@ -657,6 +657,118 @@ function updateSlideFromContent(card) {
 // ============================================
 // Event: Manual Text Editing → Text Changed
 // ============================================
+
+// Monitor edits inside modifier words — update tooltip, remove when empty
+$slidesArea.addEventListener('input', (e) => {
+  if (ignoreInput) return;
+  const mw = e.target.closest?.('.mw') || (function() {
+    const sel = window.getSelection();
+    if (!sel.anchorNode) return null;
+    const node = sel.anchorNode.nodeType === Node.TEXT_NODE
+      ? sel.anchorNode.parentElement : sel.anchorNode;
+    return node?.closest('.mw');
+  })();
+  if (!mw) return;
+
+  const text = getWordText(mw);
+  if (!text) {
+    // All letters gone — remove modifier word
+    const card = findSlideCard(mw);
+    const parentEditor = findEditorFromNode(mw);
+    ignoreInput = true;
+    mw.replaceWith(document.createTextNode(''));
+    if (parentEditor) parentEditor.normalize();
+    ignoreInput = false;
+    updateSlideFromContent(card);
+    return;
+  }
+
+  // Refresh tooltip with new text
+  const mods = JSON.parse(mw.dataset.mods || '[]');
+  mw.dataset.tip = mods
+    .map((m) => {
+      const label = MODIFIERS[m.type]?.label || m.type;
+      const val = m.badge || m.value;
+      return val && val !== 'On' ? `${label}: ${val}` : label;
+    })
+    .join(' \u00B7 ');
+});
+
+// Backspace/Delete adjacent to modifier words — remove one letter at a time
+$slidesArea.addEventListener('keydown', (e) => {
+  if (e.key !== 'Backspace' && e.key !== 'Delete') return;
+
+  const sel = window.getSelection();
+  if (!sel.isCollapsed || !sel.anchorNode) return;
+
+  const anchor = sel.anchorNode;
+  const offset = sel.anchorOffset;
+  let mw = null;
+
+  if (e.key === 'Backspace') {
+    // Cursor right after .mw (in parent text node or at boundary)
+    if (anchor.nodeType === Node.TEXT_NODE && offset === 0) {
+      const prev = anchor.previousSibling;
+      if (prev && prev.classList?.contains('mw')) mw = prev;
+    } else if (anchor.nodeType === Node.ELEMENT_NODE) {
+      const child = anchor.childNodes[offset - 1];
+      if (child && child.classList?.contains('mw')) mw = child;
+    }
+    if (!mw) return;
+
+    e.preventDefault();
+    const text = getWordText(mw);
+    if (text.length <= 1) {
+      // Last letter — remove the whole modifier word
+      const card = findSlideCard(mw);
+      const parentEditor = findEditorFromNode(mw);
+      ignoreInput = true;
+      mw.replaceWith(document.createTextNode(''));
+      if (parentEditor) parentEditor.normalize();
+      ignoreInput = false;
+      updateSlideFromContent(card);
+    } else {
+      // Remove last character, rebuild modifier word
+      const newText = text.slice(0, -1);
+      const mods = JSON.parse(mw.dataset.mods || '[]');
+      ignoreInput = true;
+      mw.innerHTML = '';
+      renderModifierWordContent(mw, newText, mods);
+      ignoreInput = false;
+      updateSlideFromContent(findSlideCard(mw));
+    }
+  } else if (e.key === 'Delete') {
+    // Cursor right before .mw
+    if (anchor.nodeType === Node.TEXT_NODE && offset === anchor.textContent.length) {
+      const next = anchor.nextSibling;
+      if (next && next.classList?.contains('mw')) mw = next;
+    } else if (anchor.nodeType === Node.ELEMENT_NODE) {
+      const child = anchor.childNodes[offset];
+      if (child && child.classList?.contains('mw')) mw = child;
+    }
+    if (!mw) return;
+
+    e.preventDefault();
+    const text = getWordText(mw);
+    if (text.length <= 1) {
+      const card = findSlideCard(mw);
+      const parentEditor = findEditorFromNode(mw);
+      ignoreInput = true;
+      mw.replaceWith(document.createTextNode(''));
+      if (parentEditor) parentEditor.normalize();
+      ignoreInput = false;
+      updateSlideFromContent(card);
+    } else {
+      const newText = text.slice(1);
+      const mods = JSON.parse(mw.dataset.mods || '[]');
+      ignoreInput = true;
+      mw.innerHTML = '';
+      renderModifierWordContent(mw, newText, mods);
+      ignoreInput = false;
+      updateSlideFromContent(findSlideCard(mw));
+    }
+  }
+});
 
 // Capture original HTML BEFORE any edits happen
 $slidesArea.addEventListener('beforeinput', (e) => {
