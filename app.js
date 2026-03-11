@@ -487,6 +487,9 @@ $subTone.addEventListener('click', (e) => {
 
 // Open level 3: language list (alongside level 2)
 $btnSelectLang.addEventListener('click', () => {
+  // Blur input so it doesn't stay focused when reopening level 3
+  $saInput.blur();
+
   // Calculate available space for level 3 without moving the wrap
   const wrapRect = $ctxWrap.getBoundingClientRect();
   const availHeight = window.innerHeight - wrapRect.top - 12;
