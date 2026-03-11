@@ -229,15 +229,15 @@
 <!-- Context Menu -->
 <div class="ctx-wrap" id="ctxWrap">
   <div class="ctx-panel ctx-v2" id="panelMain">
-    <div class="ctx-v2-group-label" id="menuWordLabel">Edit word</div>
+    <div class="ctx-v2-group-label" id="menuWordLabel">Voice settings</div>
     <button class="ctx-v2-item" data-action="sayas">
       <span class="ctx-color-dot"></span>
-      <span class="ctx-v2-label">Say As</span>
+      <span class="ctx-v2-label">Pronounce as</span>
       <span class="ctx-v2-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
     </button>
     <button class="ctx-v2-item" data-action="accent">
       <span class="ctx-color-dot"></span>
-      <span class="ctx-v2-label">Tone</span>
+      <span class="ctx-v2-label">Emphasis</span>
       <span class="ctx-v2-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
     </button>
     <button class="ctx-v2-item" data-action="pause">
@@ -249,61 +249,116 @@
 
   <!-- Sub-panel: Pause -->
   <div class="ctx-panel sub" id="subPause" style="display: none">
-    <div class="ctx-hd">Pause before word</div>
+    <div class="ctx-hd">Before word</div>
     <div class="pause-options">
-      <button class="a-item" data-pause="before" data-dur="0.5">Short <span class="pause-dur">0.5s</span></button>
-      <button class="a-item" data-pause="before" data-dur="1.0">Long <span class="pause-dur">1.0s</span></button>
+      <button class="a-item" data-pause="before" data-dur="0.3">Short <span class="pause-dur">0.3s</span></button>
+      <button class="a-item" data-pause="before" data-dur="0.7">Long <span class="pause-dur">0.7s</span></button>
     </div>
-    <div class="ctx-hd">Pause after word</div>
+    <div class="ctx-hd">After word</div>
     <div class="pause-options">
-      <button class="a-item" data-pause="after" data-dur="0.5">Short <span class="pause-dur">0.5s</span></button>
-      <button class="a-item" data-pause="after" data-dur="1.0">Long <span class="pause-dur">1.0s</span></button>
+      <button class="a-item" data-pause="after" data-dur="0.3">Short <span class="pause-dur">0.3s</span></button>
+      <button class="a-item" data-pause="after" data-dur="0.7">Long <span class="pause-dur">0.7s</span></button>
     </div>
   </div>
 
-  <!-- Sub-panel: Tone -->
+  <!-- Sub-panel: Emphasis -->
   <div class="ctx-panel sub" id="subTone" style="display: none">
-    <div class="ctx-hd">Choose tone</div>
+    <div class="ctx-hd">Makes the word stand out in the sentence.</div>
+    <button class="a-item" data-tone="Subtle">Subtle</button>
     <button class="a-item" data-tone="Strong">Strong</button>
-    <button class="a-item" data-tone="Soft">Soft</button>
-    <button class="a-item" data-tone="Formal">Formal</button>
-    <button class="a-item" data-tone="Emotional">Emotional</button>
-    <button class="a-item" data-tone="Emphasis">Emphasis</button>
+    <button class="a-item" data-tone="Whisper">Whisper</button>
     <button class="a-item" data-tone="Excited">Excited</button>
-    <button class="a-item" data-tone="Questioning">Questioning</button>
+    <button class="a-item" data-tone="Slow">Slow</button>
   </div>
 
-  <!-- Sub-panel: Say As (Level 2) -->
+  <!-- Sub-panel: Pronounce as (Level 2) -->
   <div class="ctx-panel sub" id="subSayAs" style="display: none">
     <button class="a-item sa-lang-trigger" id="btnSelectLang">
-      Select language
+      Language / accent
       <span class="ctx-v2-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
     </button>
-    <div class="sa-section-label">or type your own</div>
+    <div class="sa-divider">or</div>
     <div class="sa-form">
       <div class="sa-input-wrap">
-        <input class="sa-input" id="saInput" type="text" placeholder="Type how to pronounce...">
+        <input class="sa-input" id="saInput" type="text" placeholder="Enter custom pronunciation">
         <button class="btn-apply-inline hidden" id="btnSaApply">Apply</button>
       </div>
+      <div class="sa-helper">Write the word the way it should sound. Example: "Nike" → nai-kee</div>
     </div>
   </div>
 
-  <!-- Sub-panel: Say As Languages (Level 3) -->
+  <!-- Sub-panel: Languages & Accents (Level 3) -->
   <div class="ctx-panel sub" id="subSayAsLangs" style="display: none">
-    <button class="a-item" data-sal="AR"><span class="sa-flag">🇸🇦</span> Arabic</button>
-    <button class="a-item" data-sal="ZH"><span class="sa-flag">🇨🇳</span> Chinese</button>
-    <button class="a-item" data-sal="NL"><span class="sa-flag">🇳🇱</span> Dutch</button>
-    <button class="a-item" data-sal="EN"><span class="sa-flag">🇬🇧</span> English</button>
-    <button class="a-item" data-sal="ES"><span class="sa-flag">🇪🇸</span> Espaniol</button>
-    <button class="a-item" data-sal="FR"><span class="sa-flag">🇫🇷</span> French</button>
-    <button class="a-item" data-sal="DE"><span class="sa-flag">🇩🇪</span> German</button>
-    <button class="a-item" data-sal="HI"><span class="sa-flag">🇮🇳</span> Hindi</button>
-    <button class="a-item" data-sal="IT"><span class="sa-flag">🇮🇹</span> Italian</button>
-    <button class="a-item" data-sal="JA"><span class="sa-flag">🇯🇵</span> Japanese</button>
-    <button class="a-item" data-sal="KO"><span class="sa-flag">🇰🇷</span> Korean</button>
-    <button class="a-item" data-sal="PL"><span class="sa-flag">🇵🇱</span> Polish</button>
-    <button class="a-item" data-sal="PT"><span class="sa-flag">🇵🇹</span> Portuguese</button>
-    <button class="a-item" data-sal="SV"><span class="sa-flag">🇸🇪</span> Swedish</button>
+    <div class="sal-search-wrap">
+      <span class="sal-search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <input class="sal-search" id="salSearch" type="text" placeholder="Search...">
+    </div>
+    <div class="ctx-separator"></div>
+    <div class="sal-list" id="salList">
+      <!-- Languages with accents -->
+      <div class="sal-group" data-lang="arabic">
+        <div class="sal-lang-name"><span class="sa-flag">🇸🇦</span> Arabic</div>
+        <button class="a-item sal-accent" data-sal="AR">Modern Standard</button>
+        <button class="a-item sal-accent" data-sal="AR-EG">Egyptian</button>
+      </div>
+      <div class="sal-group" data-lang="chinese">
+        <div class="sal-lang-name"><span class="sa-flag">🇨🇳</span> Chinese</div>
+        <button class="a-item sal-accent" data-sal="ZH">Mandarin</button>
+        <button class="a-item sal-accent" data-sal="ZH-YUE">Cantonese</button>
+      </div>
+      <div class="sal-group" data-lang="dutch">
+        <button class="a-item" data-sal="NL"><span class="sa-flag">🇳🇱</span> Dutch</button>
+      </div>
+      <div class="sal-group" data-lang="english">
+        <div class="sal-lang-name"><span class="sa-flag">🇬🇧</span> English</div>
+        <button class="a-item sal-accent" data-sal="EN-US">American</button>
+        <button class="a-item sal-accent" data-sal="EN-GB">British</button>
+        <button class="a-item sal-accent" data-sal="EN-AU">Australian</button>
+      </div>
+      <div class="sal-group" data-lang="french">
+        <div class="sal-lang-name"><span class="sa-flag">🇫🇷</span> French</div>
+        <button class="a-item sal-accent" data-sal="FR">Metropolitan</button>
+        <button class="a-item sal-accent" data-sal="FR-CA">Canadian</button>
+      </div>
+      <div class="sal-group" data-lang="german">
+        <button class="a-item" data-sal="DE"><span class="sa-flag">🇩🇪</span> German</button>
+      </div>
+      <div class="sal-group" data-lang="hindi">
+        <button class="a-item" data-sal="HI"><span class="sa-flag">🇮🇳</span> Hindi</button>
+      </div>
+      <div class="sal-group" data-lang="italian">
+        <button class="a-item" data-sal="IT"><span class="sa-flag">🇮🇹</span> Italian</button>
+      </div>
+      <div class="sal-group" data-lang="japanese">
+        <button class="a-item" data-sal="JA"><span class="sa-flag">🇯🇵</span> Japanese</button>
+      </div>
+      <div class="sal-group" data-lang="korean">
+        <button class="a-item" data-sal="KO"><span class="sa-flag">🇰🇷</span> Korean</button>
+      </div>
+      <div class="sal-group" data-lang="polish">
+        <button class="a-item" data-sal="PL"><span class="sa-flag">🇵🇱</span> Polish</button>
+      </div>
+      <div class="sal-group" data-lang="portuguese">
+        <div class="sal-lang-name"><span class="sa-flag">🇵🇹</span> Portuguese</div>
+        <button class="a-item sal-accent" data-sal="PT">Continental</button>
+        <button class="a-item sal-accent" data-sal="PT-BR">Brazilian</button>
+      </div>
+      <div class="sal-group" data-lang="russian">
+        <button class="a-item" data-sal="RU"><span class="sa-flag">🇷🇺</span> Russian</button>
+      </div>
+      <div class="sal-group" data-lang="spanish">
+        <div class="sal-lang-name"><span class="sa-flag">🇪🇸</span> Spanish</div>
+        <button class="a-item sal-accent" data-sal="ES">Castilian</button>
+        <button class="a-item sal-accent" data-sal="ES-419">Latin American</button>
+      </div>
+      <div class="sal-group" data-lang="swedish">
+        <button class="a-item" data-sal="SV"><span class="sa-flag">🇸🇪</span> Swedish</button>
+      </div>
+      <div class="sal-group" data-lang="turkish">
+        <button class="a-item" data-sal="TR"><span class="sa-flag">🇹🇷</span> Turkish</button>
+      </div>
+      <div class="sal-no-results" style="display:none">No languages found</div>
+    </div>
   </div>
 </div>
 

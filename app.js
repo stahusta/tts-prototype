@@ -9,8 +9,8 @@
 
 const MODIFIERS = {
   pause: { label: 'Pause' },
-  accent: { label: 'Tone' },
-  sayas: { label: 'Say As' },
+  accent: { label: 'Emphasis' },
+  sayas: { label: 'Pronounce as' },
 };
 
 const MOD_ORDER = ['pause', 'accent', 'sayas'];
@@ -37,6 +37,8 @@ const $btnSelectLang = document.getElementById('btnSelectLang');
 const $saInput = document.getElementById('saInput');
 const $btnSaApply = document.getElementById('btnSaApply');
 const $menuWordLabel = document.getElementById('menuWordLabel');
+const $salSearch = document.getElementById('salSearch');
+const $salList = document.getElementById('salList');
 
 const SUB_PANELS = [$subPause, $subTone, $subSayAs, $subSayAsLangs];
 
@@ -183,7 +185,7 @@ function buildMainPanel(word, mwEl) {
   const modsByType = {};
   for (const mod of mods) modsByType[mod.type] = mod;
 
-  $menuWordLabel.textContent = 'Edit word';
+  $menuWordLabel.textContent = 'Voice settings';
 
   for (const item of $panelMain.querySelectorAll('[data-action]')) {
     const type = item.dataset.action;
@@ -503,8 +505,9 @@ $subPause.addEventListener('click', (e) => {
   if (btn && savedSelection) {
     const position = btn.dataset.pause; // "before" or "after"
     const dur = btn.dataset.dur;        // "0.5" or "1.0"
-    const label = position === 'before' ? 'Before' : 'After';
-    const badge = `${label} ${dur}s`;
+    const posLabel = position === 'before' ? 'Before' : 'After';
+    const durLabel = dur === '0.3' ? 'Short' : 'Long';
+    const badge = `${posLabel} · ${durLabel}`;
     applyModifier('pause', `${position}:${dur}`, badge);
   }
 });
@@ -528,23 +531,24 @@ $subTone.addEventListener('click', (e) => {
 $btnSelectLang.addEventListener('click', () => {
   $saInput.blur();
 
-  // Show panel to measure first item offset
-  $subSayAsLangs.style.display = 'block';
+  // Reset search on open
+  $salSearch.value = '';
+  $salSearch.dispatchEvent(new Event('input'));
+
+  // Show panel to measure offset
+  $subSayAsLangs.style.display = 'flex';
 
   const wrapRect = $ctxWrap.getBoundingClientRect();
-  const triggerRect = $btnSelectLang.getBoundingClientRect();
-  const firstItem = $subSayAsLangs.querySelector('.a-item');
-  const firstItemOffset = firstItem
-    ? firstItem.getBoundingClientRect().top - $subSayAsLangs.getBoundingClientRect().top
-    : 0;
+  const sayAsRect = $subSayAs.getBoundingClientRect();
 
-  let offsetTop = triggerRect.top - wrapRect.top - firstItemOffset;
+  // Align Level 3 top with Level 2 top
+  let offsetTop = sayAsRect.top - wrapRect.top;
   if (offsetTop < 0) offsetTop = 0;
   $subSayAsLangs.style.marginTop = offsetTop + 'px';
   $subSayAsLangs.style.alignSelf = 'flex-start';
 
   const availHeight = window.innerHeight - wrapRect.top - offsetTop - 12;
-  $subSayAsLangs.style.maxHeight = Math.max(availHeight, 150) + 'px';
+  $subSayAsLangs.style.maxHeight = Math.min(460, Math.max(availHeight, 150)) + 'px';
 
   $btnSelectLang.classList.add('active-path');
   requestAnimationFrame(() => {
@@ -559,12 +563,68 @@ $btnSelectLang.addEventListener('click', () => {
   });
 });
 
-// Level 3: language selection
+// Level 3: language/accent selection
 $subSayAsLangs.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-sal]');
-  if (btn && savedSelection) {
-    applyModifier('sayas', 'lang:' + btn.dataset.sal, btn.textContent.trim());
+  if (!btn || !savedSelection) return;
+
+  const group = btn.closest('.sal-group');
+  const langName = group?.querySelector('.sal-lang-name');
+  let badge;
+
+  if (langName && btn.classList.contains('sal-accent')) {
+    // Accent item — show "Flag Language, Accent"
+    const lang = langName.textContent.trim();
+    badge = lang + ', ' + btn.textContent.trim();
+  } else {
+    badge = btn.textContent.trim();
   }
+
+  applyModifier('sayas', 'lang:' + btn.dataset.sal, badge);
+});
+
+// Level 3: search filtering
+$salSearch.addEventListener('input', () => {
+  const q = $salSearch.value.toLowerCase().trim();
+  const groups = $salList.querySelectorAll('.sal-group');
+  let anyVisible = false;
+
+  for (const group of groups) {
+    const lang = group.dataset.lang || '';
+    const accents = [...group.querySelectorAll('.sal-accent')];
+    const langNameEl = group.querySelector('.sal-lang-name');
+    const singleItem = group.querySelector('.a-item:not(.sal-accent)');
+
+    if (!q) {
+      group.style.display = '';
+      if (langNameEl) langNameEl.style.display = '';
+      for (const a of accents) a.style.display = '';
+      if (singleItem) singleItem.style.display = '';
+      anyVisible = true;
+      continue;
+    }
+
+    const langMatch = lang.includes(q);
+
+    if (accents.length > 0) {
+      let groupVisible = false;
+      for (const a of accents) {
+        const accentMatch = a.textContent.toLowerCase().includes(q);
+        a.style.display = (langMatch || accentMatch) ? '' : 'none';
+        if (langMatch || accentMatch) groupVisible = true;
+      }
+      group.style.display = groupVisible ? '' : 'none';
+      if (langNameEl) langNameEl.style.display = groupVisible ? '' : 'none';
+      if (groupVisible) anyVisible = true;
+    } else if (singleItem) {
+      const match = langMatch || singleItem.textContent.toLowerCase().includes(q);
+      group.style.display = match ? '' : 'none';
+      if (match) anyVisible = true;
+    }
+  }
+
+  const noResults = $salList.querySelector('.sal-no-results');
+  if (noResults) noResults.style.display = anyVisible ? 'none' : '';
 });
 
 $btnSaApply.addEventListener('click', () => {
@@ -599,6 +659,7 @@ $ctxWrap.addEventListener('mousedown', (e) => {
     $btnSelectLang.classList.remove('active-path');
     return;
   }
+  if (e.target === $salSearch) return;
   e.preventDefault();
 });
 
@@ -750,6 +811,19 @@ $slidesArea.addEventListener('input', (e) => {
     const parentEditor = findEditorFromNode(mw);
     ignoreInput = true;
     mw.replaceWith(document.createTextNode(''));
+    if (parentEditor) parentEditor.normalize();
+    ignoreInput = false;
+    updateSlideFromContent(card);
+    return;
+  }
+
+  // Space inside modifier word — remove modifier, keep text
+  if (/\s/.test(text)) {
+    const card = findSlideCard(mw);
+    const parentEditor = findEditorFromNode(mw);
+    const textNode = document.createTextNode(text);
+    ignoreInput = true;
+    mw.replaceWith(textNode);
     if (parentEditor) parentEditor.normalize();
     ignoreInput = false;
     updateSlideFromContent(card);
