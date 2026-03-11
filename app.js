@@ -114,6 +114,8 @@ function closeSubPanels() {
   for (const panel of SUB_PANELS) {
     panel.classList.remove('vis');
     panel.style.display = 'none';
+    panel.style.marginTop = '';
+    panel.style.alignSelf = '';
   }
   // Clear all active-path highlights
   for (const el of $ctxWrap.querySelectorAll('.active-path')) {
@@ -133,18 +135,35 @@ function resetMenuState() {
   targetModifierWord = null;
 }
 
-function openSubPanel(panel) {
+function openSubPanel(panel, triggerEl) {
   closeSubPanels();
 
-  // Cap sub-panel height to available viewport space
+  // Show panel off-screen to measure first item offset
+  panel.style.display = 'block';
+
   const wrapRect = $ctxWrap.getBoundingClientRect();
-  const availBelow = window.innerHeight - wrapRect.top - 12;
+  let offsetTop = 0;
+
+  if (triggerEl) {
+    const triggerRect = triggerEl.getBoundingClientRect();
+    const firstItem = panel.querySelector('.a-item');
+    const firstItemOffset = firstItem
+      ? firstItem.getBoundingClientRect().top - panel.getBoundingClientRect().top
+      : 0;
+
+    // Align first item in sub-panel with the trigger item
+    offsetTop = triggerRect.top - wrapRect.top - firstItemOffset;
+    if (offsetTop < 0) offsetTop = 0;
+  }
+  panel.style.marginTop = offsetTop + 'px';
+  panel.style.alignSelf = 'flex-start';
+
+  // Cap sub-panel height to available viewport space
+  const availBelow = window.innerHeight - wrapRect.top - offsetTop - 12;
   panel.style.maxHeight = Math.max(availBelow, 150) + 'px';
 
-  panel.style.display = 'block';
   requestAnimationFrame(() => {
     panel.classList.add('vis');
-    // Only adjust horizontal overflow, keep vertical position stable
     const rect = $ctxWrap.getBoundingClientRect();
     if (rect.right > window.innerWidth - 12) {
       let x = parseFloat($ctxWrap.style.left);
@@ -420,6 +439,26 @@ $panelMain.addEventListener('click', (e) => {
     if (idx >= 0) mods.splice(idx, 1);
 
     const card = findSlideCard(targetModifierWord);
+    const wordText = getWordText(targetModifierWord);
+
+    if (mods.length === 0) {
+      // Last modifier removed — unwrap .mw but keep selection for re-adding
+      const textNode = document.createTextNode(wordText);
+      ignoreInput = true;
+      targetModifierWord.replaceWith(textNode);
+      ignoreInput = false;
+
+      const range = document.createRange();
+      range.setStart(textNode, 0);
+      range.setEnd(textNode, wordText.length);
+
+      targetModifierWord = null;
+      savedSelection = { range, text: wordText };
+      closeSubPanels();
+      buildMainPanel(wordText, null);
+      updateSlideFromContent(card);
+      return;
+    }
 
     ignoreInput = true;
     targetModifierWord.dataset.mods = JSON.stringify(mods);
@@ -427,7 +466,7 @@ $panelMain.addEventListener('click', (e) => {
     ignoreInput = false;
 
     closeSubPanels();
-    buildMainPanel(getWordText(targetModifierWord), targetModifierWord);
+    buildMainPanel(wordText, targetModifierWord);
 
     updateSlideFromContent(card);
     return;
@@ -439,16 +478,16 @@ $panelMain.addEventListener('click', (e) => {
   const type = item.dataset.action;
 
   if (type === 'pause') {
-    openSubPanel($subPause);
+    openSubPanel($subPause, item);
     item.classList.add('active-path');
     return;
   }
 
   if (type === 'accent') {
-    openSubPanel($subTone);
+    openSubPanel($subTone, item);
     item.classList.add('active-path');
   } else if (type === 'sayas') {
-    openSubPanel($subSayAs);
+    openSubPanel($subSayAs, item);
     item.classList.add('active-path');
     $saInput.value = '';
     $btnSaApply.classList.add('hidden');
@@ -487,19 +526,29 @@ $subTone.addEventListener('click', (e) => {
 
 // Open level 3: language list (alongside level 2)
 $btnSelectLang.addEventListener('click', () => {
-  // Blur input so it doesn't stay focused when reopening level 3
   $saInput.blur();
 
-  // Calculate available space for level 3 without moving the wrap
+  // Show panel to measure first item offset
+  $subSayAsLangs.style.display = 'block';
+
   const wrapRect = $ctxWrap.getBoundingClientRect();
-  const availHeight = window.innerHeight - wrapRect.top - 12;
+  const triggerRect = $btnSelectLang.getBoundingClientRect();
+  const firstItem = $subSayAsLangs.querySelector('.a-item');
+  const firstItemOffset = firstItem
+    ? firstItem.getBoundingClientRect().top - $subSayAsLangs.getBoundingClientRect().top
+    : 0;
+
+  let offsetTop = triggerRect.top - wrapRect.top - firstItemOffset;
+  if (offsetTop < 0) offsetTop = 0;
+  $subSayAsLangs.style.marginTop = offsetTop + 'px';
+  $subSayAsLangs.style.alignSelf = 'flex-start';
+
+  const availHeight = window.innerHeight - wrapRect.top - offsetTop - 12;
   $subSayAsLangs.style.maxHeight = Math.max(availHeight, 150) + 'px';
 
   $btnSelectLang.classList.add('active-path');
-  $subSayAsLangs.style.display = 'block';
   requestAnimationFrame(() => {
     $subSayAsLangs.classList.add('vis');
-    // Only adjust horizontal overflow, don't move vertically
     const rect = $ctxWrap.getBoundingClientRect();
     if (rect.right > window.innerWidth - 12) {
       let x = parseFloat($ctxWrap.style.left);
