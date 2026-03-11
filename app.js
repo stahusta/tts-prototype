@@ -658,21 +658,45 @@ function updateSlideFromContent(card) {
 // Event: Manual Text Editing → Text Changed
 // ============================================
 
+/** Find the .mw element from current selection, if any. */
+function findMwFromSelection() {
+  const sel = window.getSelection();
+  if (!sel.anchorNode) return null;
+  const node = sel.anchorNode.nodeType === Node.TEXT_NODE
+    ? sel.anchorNode.parentElement : sel.anchorNode;
+  return node?.closest('.mw') || null;
+}
+
+/** Remove a single letter from a modifier word, or destroy it if empty. */
+function trimModifierWord(mw, fromEnd) {
+  const text = getWordText(mw);
+  if (text.length <= 1) {
+    const card = findSlideCard(mw);
+    const parentEditor = findEditorFromNode(mw);
+    ignoreInput = true;
+    mw.replaceWith(document.createTextNode(''));
+    if (parentEditor) parentEditor.normalize();
+    ignoreInput = false;
+    updateSlideFromContent(card);
+  } else {
+    const newText = fromEnd ? text.slice(0, -1) : text.slice(1);
+    const mods = JSON.parse(mw.dataset.mods || '[]');
+    ignoreInput = true;
+    mw.innerHTML = '';
+    renderModifierWordContent(mw, newText, mods);
+    ignoreInput = false;
+    updateSlideFromContent(findSlideCard(mw));
+  }
+}
+
 // Monitor edits inside modifier words — update tooltip, remove when empty
 $slidesArea.addEventListener('input', (e) => {
   if (ignoreInput) return;
-  const mw = e.target.closest?.('.mw') || (function() {
-    const sel = window.getSelection();
-    if (!sel.anchorNode) return null;
-    const node = sel.anchorNode.nodeType === Node.TEXT_NODE
-      ? sel.anchorNode.parentElement : sel.anchorNode;
-    return node?.closest('.mw');
-  })();
+  const mw = e.target.closest?.('.mw') || findMwFromSelection();
   if (!mw) return;
 
   const text = getWordText(mw);
   if (!text) {
-    // All letters gone — remove modifier word
     const card = findSlideCard(mw);
     const parentEditor = findEditorFromNode(mw);
     ignoreInput = true;
@@ -706,7 +730,6 @@ $slidesArea.addEventListener('keydown', (e) => {
   let mw = null;
 
   if (e.key === 'Backspace') {
-    // Cursor right after .mw (in parent text node or at boundary)
     if (anchor.nodeType === Node.TEXT_NODE && offset === 0) {
       const prev = anchor.previousSibling;
       if (prev && prev.classList?.contains('mw')) mw = prev;
@@ -715,30 +738,9 @@ $slidesArea.addEventListener('keydown', (e) => {
       if (child && child.classList?.contains('mw')) mw = child;
     }
     if (!mw) return;
-
     e.preventDefault();
-    const text = getWordText(mw);
-    if (text.length <= 1) {
-      // Last letter — remove the whole modifier word
-      const card = findSlideCard(mw);
-      const parentEditor = findEditorFromNode(mw);
-      ignoreInput = true;
-      mw.replaceWith(document.createTextNode(''));
-      if (parentEditor) parentEditor.normalize();
-      ignoreInput = false;
-      updateSlideFromContent(card);
-    } else {
-      // Remove last character, rebuild modifier word
-      const newText = text.slice(0, -1);
-      const mods = JSON.parse(mw.dataset.mods || '[]');
-      ignoreInput = true;
-      mw.innerHTML = '';
-      renderModifierWordContent(mw, newText, mods);
-      ignoreInput = false;
-      updateSlideFromContent(findSlideCard(mw));
-    }
+    trimModifierWord(mw, true);
   } else if (e.key === 'Delete') {
-    // Cursor right before .mw
     if (anchor.nodeType === Node.TEXT_NODE && offset === anchor.textContent.length) {
       const next = anchor.nextSibling;
       if (next && next.classList?.contains('mw')) mw = next;
@@ -747,26 +749,8 @@ $slidesArea.addEventListener('keydown', (e) => {
       if (child && child.classList?.contains('mw')) mw = child;
     }
     if (!mw) return;
-
     e.preventDefault();
-    const text = getWordText(mw);
-    if (text.length <= 1) {
-      const card = findSlideCard(mw);
-      const parentEditor = findEditorFromNode(mw);
-      ignoreInput = true;
-      mw.replaceWith(document.createTextNode(''));
-      if (parentEditor) parentEditor.normalize();
-      ignoreInput = false;
-      updateSlideFromContent(card);
-    } else {
-      const newText = text.slice(1);
-      const mods = JSON.parse(mw.dataset.mods || '[]');
-      ignoreInput = true;
-      mw.innerHTML = '';
-      renderModifierWordContent(mw, newText, mods);
-      ignoreInput = false;
-      updateSlideFromContent(findSlideCard(mw));
-    }
+    trimModifierWord(mw, false);
   }
 });
 
@@ -788,6 +772,8 @@ $slidesArea.addEventListener('input', (e) => {
   if (ignoreInput) return;
   const te = e.target.closest('.te');
   if (!te) return;
+  // Skip edits inside modifier words — handled by the .mw input listener above
+  if (findMwFromSelection()) return;
   const card = te.closest('.slide-card');
   if (!card || card.dataset.state === 'no-audio') return;
 
