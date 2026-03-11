@@ -532,7 +532,12 @@ $saInput.addEventListener('input', () => {
 
 $ctxWrap.addEventListener('mousedown', (e) => {
   // Allow focus on interactive elements, prevent elsewhere to keep text selection
-  if (e.target === $saInput) return;
+  if (e.target === $saInput) {
+    // Hide level 3 when clicking input in level 2
+    $subSayAsLangs.classList.remove('vis');
+    $subSayAsLangs.style.display = 'none';
+    return;
+  }
   e.preventDefault();
 });
 
