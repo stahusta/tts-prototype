@@ -32,11 +32,13 @@ const $panelMain = document.getElementById('panelMain');
 const $subPause = document.getElementById('subPause');
 const $subTone = document.getElementById('subTone');
 const $subSayAs = document.getElementById('subSayAs');
+const $subSayAsLangs = document.getElementById('subSayAsLangs');
+const $btnSelectLang = document.getElementById('btnSelectLang');
 const $saInput = document.getElementById('saInput');
 const $btnSaApply = document.getElementById('btnSaApply');
 const $menuWordLabel = document.getElementById('menuWordLabel');
 
-const SUB_PANELS = [$subPause, $subTone, $subSayAs];
+const SUB_PANELS = [$subPause, $subTone, $subSayAs, $subSayAsLangs];
 
 // ============================================
 // State
@@ -411,7 +413,6 @@ $panelMain.addEventListener('click', (e) => {
     openSubPanel($subTone);
   } else if (type === 'sayas') {
     openSubPanel($subSayAs);
-    $saLangSelect.selectedIndex = 0;
     $saInput.value = '';
     $btnSaApply.classList.add('hidden');
   }
@@ -447,13 +448,22 @@ $subTone.addEventListener('click', (e) => {
 // Event: Sub-panel — Say As
 // ============================================
 
-const $saLangSelect = document.getElementById('saLangSelect');
+// Open level 3: language list
+$btnSelectLang.addEventListener('click', () => {
+  $subSayAs.classList.remove('vis');
+  $subSayAs.style.display = 'none';
+  $subSayAsLangs.style.display = 'block';
+  requestAnimationFrame(() => {
+    $subSayAsLangs.classList.add('vis');
+    adjustMenuPosition();
+  });
+});
 
-$saLangSelect.addEventListener('change', () => {
-  const val = $saLangSelect.value;
-  if (val && savedSelection) {
-    const label = $saLangSelect.options[$saLangSelect.selectedIndex].text;
-    applyModifier('sayas', 'lang:' + val, label.trim());
+// Level 3: language selection
+$subSayAsLangs.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-sal]');
+  if (btn && savedSelection) {
+    applyModifier('sayas', 'lang:' + btn.dataset.sal, btn.textContent.trim());
   }
 });
 
@@ -482,7 +492,7 @@ $saInput.addEventListener('input', () => {
 
 $ctxWrap.addEventListener('mousedown', (e) => {
   // Allow focus on interactive elements, prevent elsewhere to keep text selection
-  if (e.target === $saInput || e.target === $saLangSelect) return;
+  if (e.target === $saInput) return;
   e.preventDefault();
 });
 

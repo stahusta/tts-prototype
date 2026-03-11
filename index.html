@@ -230,9 +230,9 @@
 <div class="ctx-wrap" id="ctxWrap">
   <div class="ctx-panel ctx-v2" id="panelMain">
     <div class="ctx-v2-group-label" id="menuWordLabel">Edit word</div>
-    <button class="ctx-v2-item" data-action="pause">
+    <button class="ctx-v2-item" data-action="sayas">
       <span class="ctx-color-dot"></span>
-      <span class="ctx-v2-label">Pause</span>
+      <span class="ctx-v2-label">Say As</span>
       <span class="ctx-v2-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
     </button>
     <button class="ctx-v2-item" data-action="accent">
@@ -240,9 +240,9 @@
       <span class="ctx-v2-label">Tone</span>
       <span class="ctx-v2-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
     </button>
-    <button class="ctx-v2-item" data-action="sayas">
+    <button class="ctx-v2-item" data-action="pause">
       <span class="ctx-color-dot"></span>
-      <span class="ctx-v2-label">Say As</span>
+      <span class="ctx-v2-label">Pause</span>
       <span class="ctx-v2-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
     </button>
   </div>
@@ -266,23 +266,20 @@
     <div class="ctx-hd">Choose tone</div>
     <button class="a-item" data-tone="Strong">Strong</button>
     <button class="a-item" data-tone="Soft">Soft</button>
-    <button class="a-item" data-tone="Questioning">Questioning</button>
+    <button class="a-item" data-tone="Formal">Formal</button>
     <button class="a-item" data-tone="Emotional">Emotional</button>
+    <button class="a-item" data-tone="Emphasis">Emphasis</button>
+    <button class="a-item" data-tone="Excited">Excited</button>
+    <button class="a-item" data-tone="Questioning">Questioning</button>
   </div>
 
-  <!-- Sub-panel: Say As -->
+  <!-- Sub-panel: Say As (Level 2) -->
   <div class="ctx-panel sub" id="subSayAs" style="display: none">
     <div class="sa-section-label">Choose language</div>
-    <div class="sa-select-wrap">
-      <select class="sa-select" id="saLangSelect">
-        <option value="" disabled selected>Select language...</option>
-        <option value="PL">🇵🇱 Polish</option>
-        <option value="EN">🇬🇧 English</option>
-        <option value="FR">🇫🇷 French</option>
-        <option value="DE">🇩🇪 German</option>
-        <option value="ES">🇪🇸 Spanish</option>
-      </select>
-    </div>
+    <button class="a-item sa-lang-trigger" id="btnSelectLang">
+      Select language
+      <span class="ctx-v2-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+    </button>
     <div class="sa-section-label">or type your own</div>
     <div class="sa-form">
       <div class="sa-input-wrap">
@@ -290,6 +287,14 @@
         <button class="btn-apply-inline hidden" id="btnSaApply">Apply</button>
       </div>
     </div>
+  </div>
+
+  <!-- Sub-panel: Say As Languages (Level 3) -->
+  <div class="ctx-panel sub" id="subSayAsLangs" style="display: none">
+    <button class="a-item" data-sal="PL"><span class="sa-flag">🇵🇱</span> Polish</button>
+    <button class="a-item" data-sal="EN"><span class="sa-flag">🇬🇧</span> English</button>
+    <button class="a-item" data-sal="FR"><span class="sa-flag">🇫🇷</span> French</button>
+    <button class="a-item" data-sal="ES"><span class="sa-flag">🇪🇸</span> Espaniol</button>
   </div>
 </div>
 
