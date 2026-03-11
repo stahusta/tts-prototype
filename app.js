@@ -92,9 +92,15 @@ function adjustMenuPosition() {
   let y = parseFloat($ctxWrap.style.top);
 
   if (rect.right > window.innerWidth - 12) x = window.innerWidth - rect.width - 12;
-  if (rect.bottom > window.innerHeight - 12) y -= rect.bottom - window.innerHeight + 16;
+
+  // Check if menu overflows bottom
+  const overflowBottom = rect.bottom > window.innerHeight - 12;
+  if (overflowBottom) y -= rect.bottom - window.innerHeight + 16;
   if (x < 12) x = 12;
   if (y < 12) y = 12;
+
+  // Align sub-panels to bottom edge when pushed up, so they don't stack upward
+  $ctxWrap.style.alignItems = overflowBottom ? 'flex-end' : 'flex-start';
 
   $ctxWrap.style.left = x + 'px';
   $ctxWrap.style.top = y + 'px';
