@@ -202,16 +202,27 @@ function buildMainPanel(word, mwEl) {
   }
 }
 
-function openMenu(x, y, word, mwEl) {
+function openMenu(x, yBelow, word, mwEl, yAbove) {
   hideMenu();
   buildMainPanel(word, mwEl);
 
+  // Temporarily position to measure height
   $ctxWrap.style.left = x + 'px';
-  $ctxWrap.style.top = y + 'px';
+  $ctxWrap.style.top = yBelow + 'px';
+  $ctxWrap.style.alignItems = 'flex-start';
   $ctxWrap.classList.add('visible');
 
   requestAnimationFrame(() => {
     $panelMain.classList.add('vis');
+
+    const panelHeight = $panelMain.getBoundingClientRect().height;
+    const spaceBelow = window.innerHeight - yBelow - 12;
+
+    // If not enough space below but enough above, flip to above
+    if (panelHeight > spaceBelow && yAbove !== undefined) {
+      $ctxWrap.style.top = (yAbove - panelHeight) + 'px';
+    }
+
     adjustMenuPosition();
   });
 }
@@ -369,7 +380,7 @@ $slidesArea.addEventListener('mouseup', (e) => {
   targetModifierWord = null;
 
   const rect = range.getBoundingClientRect();
-  openMenu(rect.left, rect.bottom + 8, text, null);
+  openMenu(rect.left, rect.bottom + 8, text, null, rect.top - 8);
 });
 
 // ============================================
@@ -387,7 +398,7 @@ $slidesArea.addEventListener('click', (e) => {
   savedSelection = { existingEl: mwEl, text: getWordText(mwEl) };
 
   const rect = mwEl.getBoundingClientRect();
-  openMenu(rect.left, rect.bottom + 8, getWordText(mwEl), mwEl);
+  openMenu(rect.left, rect.bottom + 8, getWordText(mwEl), mwEl, rect.top - 8);
 });
 
 // ============================================
