@@ -448,10 +448,8 @@ $subTone.addEventListener('click', (e) => {
 // Event: Sub-panel — Say As
 // ============================================
 
-// Open level 3: language list
+// Open level 3: language list (alongside level 2)
 $btnSelectLang.addEventListener('click', () => {
-  $subSayAs.classList.remove('vis');
-  $subSayAs.style.display = 'none';
   $subSayAsLangs.style.display = 'block';
   requestAnimationFrame(() => {
     $subSayAsLangs.classList.add('vis');
