@@ -411,6 +411,7 @@ $panelMain.addEventListener('click', (e) => {
     openSubPanel($subTone);
   } else if (type === 'sayas') {
     openSubPanel($subSayAs);
+    $saLangSelect.selectedIndex = 0;
     $saInput.value = '';
     $btnSaApply.classList.add('hidden');
   }
@@ -446,10 +447,13 @@ $subTone.addEventListener('click', (e) => {
 // Event: Sub-panel — Say As
 // ============================================
 
-$subSayAs.addEventListener('click', (e) => {
-  const btn = e.target.closest('[data-sal]');
-  if (btn && savedSelection) {
-    applyModifier('sayas', 'lang:' + btn.dataset.sal, btn.textContent.trim());
+const $saLangSelect = document.getElementById('saLangSelect');
+
+$saLangSelect.addEventListener('change', () => {
+  const val = $saLangSelect.value;
+  if (val && savedSelection) {
+    const label = $saLangSelect.options[$saLangSelect.selectedIndex].text;
+    applyModifier('sayas', 'lang:' + val, label.trim());
   }
 });
 
@@ -477,8 +481,8 @@ $saInput.addEventListener('input', () => {
 // ============================================
 
 $ctxWrap.addEventListener('mousedown', (e) => {
-  // Allow focus on the Say As input, prevent elsewhere to keep text selection
-  if (e.target === $saInput) return;
+  // Allow focus on interactive elements, prevent elsewhere to keep text selection
+  if (e.target === $saInput || e.target === $saLangSelect) return;
   e.preventDefault();
 });
 
