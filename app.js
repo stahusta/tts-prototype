@@ -131,10 +131,23 @@ function resetMenuState() {
 
 function openSubPanel(panel) {
   closeSubPanels();
+
+  // Cap sub-panel height to available viewport space
+  const wrapRect = $ctxWrap.getBoundingClientRect();
+  const availBelow = window.innerHeight - wrapRect.top - 12;
+  panel.style.maxHeight = Math.max(availBelow, 150) + 'px';
+
   panel.style.display = 'block';
   requestAnimationFrame(() => {
     panel.classList.add('vis');
-    adjustMenuPosition();
+    // Only adjust horizontal overflow, keep vertical position stable
+    const rect = $ctxWrap.getBoundingClientRect();
+    if (rect.right > window.innerWidth - 12) {
+      let x = parseFloat($ctxWrap.style.left);
+      x = window.innerWidth - rect.width - 12;
+      if (x < 12) x = 12;
+      $ctxWrap.style.left = x + 'px';
+    }
   });
 }
 
@@ -456,10 +469,22 @@ $subTone.addEventListener('click', (e) => {
 
 // Open level 3: language list (alongside level 2)
 $btnSelectLang.addEventListener('click', () => {
+  // Calculate available space for level 3 without moving the wrap
+  const wrapRect = $ctxWrap.getBoundingClientRect();
+  const availHeight = window.innerHeight - wrapRect.top - 12;
+  $subSayAsLangs.style.maxHeight = Math.max(availHeight, 150) + 'px';
+
   $subSayAsLangs.style.display = 'block';
   requestAnimationFrame(() => {
     $subSayAsLangs.classList.add('vis');
-    adjustMenuPosition();
+    // Only adjust horizontal overflow, don't move vertically
+    const rect = $ctxWrap.getBoundingClientRect();
+    if (rect.right > window.innerWidth - 12) {
+      let x = parseFloat($ctxWrap.style.left);
+      x = window.innerWidth - rect.width - 12;
+      if (x < 12) x = 12;
+      $ctxWrap.style.left = x + 'px';
+    }
   });
 });
 
