@@ -572,7 +572,9 @@ body {
   text-align: left;
 }
 
-.ctx-v2-item:hover:not(.disabled) {
+.ctx-v2-item:hover:not(.disabled),
+.ctx-v2-item.active-path,
+.a-item.active-path {
   background: #f4f4f5;
 }
 

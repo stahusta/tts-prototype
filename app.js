@@ -115,6 +115,10 @@ function closeSubPanels() {
     panel.classList.remove('vis');
     panel.style.display = 'none';
   }
+  // Clear all active-path highlights
+  for (const el of $ctxWrap.querySelectorAll('.active-path')) {
+    el.classList.remove('active-path');
+  }
 }
 
 function hideMenu() {
@@ -436,13 +440,16 @@ $panelMain.addEventListener('click', (e) => {
 
   if (type === 'pause') {
     openSubPanel($subPause);
+    item.classList.add('active-path');
     return;
   }
 
   if (type === 'accent') {
     openSubPanel($subTone);
+    item.classList.add('active-path');
   } else if (type === 'sayas') {
     openSubPanel($subSayAs);
+    item.classList.add('active-path');
     $saInput.value = '';
     $btnSaApply.classList.add('hidden');
   }
@@ -485,6 +492,7 @@ $btnSelectLang.addEventListener('click', () => {
   const availHeight = window.innerHeight - wrapRect.top - 12;
   $subSayAsLangs.style.maxHeight = Math.max(availHeight, 150) + 'px';
 
+  $btnSelectLang.classList.add('active-path');
   $subSayAsLangs.style.display = 'block';
   requestAnimationFrame(() => {
     $subSayAsLangs.classList.add('vis');
@@ -536,6 +544,7 @@ $ctxWrap.addEventListener('mousedown', (e) => {
     // Hide level 3 when clicking input in level 2
     $subSayAsLangs.classList.remove('vis');
     $subSayAsLangs.style.display = 'none';
+    $btnSelectLang.classList.remove('active-path');
     return;
   }
   e.preventDefault();
