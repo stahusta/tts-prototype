@@ -133,12 +133,12 @@ function adjustMenuPosition() {
 // Context Menu — Visibility
 // ============================================
 
-function closeSubPanels() {
+function closeSubPanels(instant) {
   for (const panel of SUB_PANELS) {
-    if (panel.classList.contains('vis')) {
+    if (!instant && panel.classList.contains('vis')) {
       panel.classList.remove('vis');
       panel.classList.add('closing');
-      const p = panel; // closure
+      const p = panel;
       setTimeout(() => {
         p.classList.remove('closing');
         p.style.display = 'none';
@@ -146,6 +146,7 @@ function closeSubPanels() {
         p.style.alignSelf = '';
       }, 120);
     } else {
+      panel.classList.remove('vis', 'closing');
       panel.style.display = 'none';
       panel.style.marginTop = '';
       panel.style.alignSelf = '';
@@ -177,7 +178,7 @@ function resetMenuState() {
 }
 
 function openSubPanel(panel, triggerEl) {
-  closeSubPanels();
+  closeSubPanels(true);
 
   // Show panel off-screen to measure first item offset
   panel.style.display = 'block';
