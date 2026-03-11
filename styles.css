@@ -526,8 +526,12 @@ body {
 .ctx-panel.sub {
   min-width: 220px;
   padding-top: 4px;
-  max-height: calc(100vh - 24px);
   overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.ctx-panel.sub::-webkit-scrollbar {
+  display: none;
 }
 
 /* Header & Separator */
