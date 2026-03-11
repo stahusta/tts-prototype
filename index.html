@@ -226,7 +226,8 @@
   </button>
 </div>
 
-<!-- Context Menu -->
+<!-- Context Menu Portal — at body level to avoid stacking context issues -->
+<div class="ctx-portal" id="ctxPortal">
 <div class="ctx-wrap" id="ctxWrap">
   <div class="ctx-panel ctx-v2" id="panelMain">
     <div class="ctx-v2-group-label" id="menuWordLabel">Voice settings</div>
@@ -360,6 +361,7 @@
       <div class="sal-no-results" style="display:none">No languages found</div>
     </div>
   </div>
+</div>
 </div>
 
 <script src="app.js"></script>

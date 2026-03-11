@@ -61,6 +61,27 @@ let activeToastSlide = null;
 const ICON_CLOSE = '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
 
 // ============================================
+// Fuzzy Search
+// ============================================
+
+function fuzzyMatch(query, text) {
+  query = query.toLowerCase();
+  text = text.toLowerCase();
+  if (text.includes(query)) return { match: true, score: 100 };
+  let qi = 0, score = 0, lastIdx = -1;
+  for (let ti = 0; ti < text.length && qi < query.length; ti++) {
+    if (text[ti] === query[qi]) {
+      score += 10;
+      if (lastIdx === ti - 1) score += 5;
+      if (ti === 0 || text[ti - 1] === ' ') score += 8;
+      lastIdx = ti;
+      qi++;
+    }
+  }
+  return { match: qi === query.length, score };
+}
+
+// ============================================
 // Helpers
 // ============================================
 
@@ -114,20 +135,38 @@ function adjustMenuPosition() {
 
 function closeSubPanels() {
   for (const panel of SUB_PANELS) {
-    panel.classList.remove('vis');
-    panel.style.display = 'none';
-    panel.style.marginTop = '';
-    panel.style.alignSelf = '';
+    if (panel.classList.contains('vis')) {
+      panel.classList.remove('vis');
+      panel.classList.add('closing');
+      const p = panel; // closure
+      setTimeout(() => {
+        p.classList.remove('closing');
+        p.style.display = 'none';
+        p.style.marginTop = '';
+        p.style.alignSelf = '';
+      }, 120);
+    } else {
+      panel.style.display = 'none';
+      panel.style.marginTop = '';
+      panel.style.alignSelf = '';
+    }
   }
-  // Clear all active-path highlights
   for (const el of $ctxWrap.querySelectorAll('.active-path')) {
     el.classList.remove('active-path');
   }
 }
 
 function hideMenu() {
-  $ctxWrap.classList.remove('visible');
-  $panelMain.classList.remove('vis');
+  if ($panelMain.classList.contains('vis')) {
+    $panelMain.classList.remove('vis');
+    $panelMain.classList.add('closing');
+    setTimeout(() => {
+      $panelMain.classList.remove('closing');
+      $ctxWrap.classList.remove('visible');
+    }, 120);
+  } else {
+    $ctxWrap.classList.remove('visible');
+  }
   closeSubPanels();
 }
 
@@ -153,9 +192,11 @@ function openSubPanel(panel, triggerEl) {
       ? firstItem.getBoundingClientRect().top - panel.getBoundingClientRect().top
       : 0;
 
-    // Align first item in sub-panel with the trigger item
     offsetTop = triggerRect.top - wrapRect.top - firstItemOffset;
     if (offsetTop < 0) offsetTop = 0;
+
+    // Dynamic transform-origin: scale from where trigger is
+    panel.style.setProperty('--origin', `left ${triggerRect.top - wrapRect.top - offsetTop}px`);
   }
   panel.style.marginTop = offsetTop + 'px';
   panel.style.alignSelf = 'flex-start';
@@ -231,7 +272,8 @@ function openMenu(x, yBelow, word, mwEl, yAbove) {
   hideMenu();
   buildMainPanel(word, mwEl);
 
-  // Temporarily position to measure height
+  $panelMain.style.setProperty('--origin', 'top left');
+
   $ctxWrap.style.left = x + 'px';
   $ctxWrap.style.top = yBelow + 'px';
   $ctxWrap.style.alignItems = 'flex-start';
@@ -243,9 +285,9 @@ function openMenu(x, yBelow, word, mwEl, yAbove) {
     const panelHeight = $panelMain.getBoundingClientRect().height;
     const spaceBelow = window.innerHeight - yBelow - 12;
 
-    // If not enough space below but enough above, flip to above
     if (panelHeight > spaceBelow && yAbove !== undefined) {
       $ctxWrap.style.top = (yAbove - panelHeight) + 'px';
+      $panelMain.style.setProperty('--origin', 'bottom left');
     }
 
     adjustMenuPosition();
@@ -549,6 +591,7 @@ $btnSelectLang.addEventListener('click', () => {
 
   const availHeight = window.innerHeight - wrapRect.top - offsetTop - 12;
   $subSayAsLangs.style.maxHeight = Math.min(460, Math.max(availHeight, 150)) + 'px';
+  $subSayAsLangs.style.setProperty('--origin', 'top left');
 
   $btnSelectLang.classList.add('active-path');
   requestAnimationFrame(() => {
@@ -583,43 +626,48 @@ $subSayAsLangs.addEventListener('click', (e) => {
   applyModifier('sayas', 'lang:' + btn.dataset.sal, badge);
 });
 
-// Level 3: search filtering
+// Level 3: fuzzy search filtering
 $salSearch.addEventListener('input', () => {
-  const q = $salSearch.value.toLowerCase().trim();
+  const q = $salSearch.value.trim();
   const groups = $salList.querySelectorAll('.sal-group');
   let anyVisible = false;
 
-  for (const group of groups) {
-    const lang = group.dataset.lang || '';
-    const accents = [...group.querySelectorAll('.sal-accent')];
-    const langNameEl = group.querySelector('.sal-lang-name');
-    const singleItem = group.querySelector('.a-item:not(.sal-accent)');
-
-    if (!q) {
+  if (!q) {
+    for (const group of groups) {
       group.style.display = '';
+      const langNameEl = group.querySelector('.sal-lang-name');
       if (langNameEl) langNameEl.style.display = '';
-      for (const a of accents) a.style.display = '';
+      for (const a of group.querySelectorAll('.sal-accent')) a.style.display = '';
+      const singleItem = group.querySelector('.a-item:not(.sal-accent)');
       if (singleItem) singleItem.style.display = '';
-      anyVisible = true;
-      continue;
     }
+    anyVisible = true;
+  } else {
+    for (const group of groups) {
+      const lang = group.dataset.lang || '';
+      const accents = [...group.querySelectorAll('.sal-accent')];
+      const langNameEl = group.querySelector('.sal-lang-name');
+      const singleItem = group.querySelector('.a-item:not(.sal-accent)');
 
-    const langMatch = lang.includes(q);
+      const langResult = fuzzyMatch(q, lang);
 
-    if (accents.length > 0) {
-      let groupVisible = false;
-      for (const a of accents) {
-        const accentMatch = a.textContent.toLowerCase().includes(q);
-        a.style.display = (langMatch || accentMatch) ? '' : 'none';
-        if (langMatch || accentMatch) groupVisible = true;
+      if (accents.length > 0) {
+        let groupVisible = false;
+        for (const a of accents) {
+          const accentResult = fuzzyMatch(q, a.textContent);
+          const show = langResult.match || accentResult.match;
+          a.style.display = show ? '' : 'none';
+          if (show) groupVisible = true;
+        }
+        group.style.display = groupVisible ? '' : 'none';
+        if (langNameEl) langNameEl.style.display = groupVisible ? '' : 'none';
+        if (groupVisible) anyVisible = true;
+      } else if (singleItem) {
+        const itemResult = fuzzyMatch(q, singleItem.textContent);
+        const match = langResult.match || itemResult.match;
+        group.style.display = match ? '' : 'none';
+        if (match) anyVisible = true;
       }
-      group.style.display = groupVisible ? '' : 'none';
-      if (langNameEl) langNameEl.style.display = groupVisible ? '' : 'none';
-      if (groupVisible) anyVisible = true;
-    } else if (singleItem) {
-      const match = langMatch || singleItem.textContent.toLowerCase().includes(q);
-      group.style.display = match ? '' : 'none';
-      if (match) anyVisible = true;
     }
   }
 
