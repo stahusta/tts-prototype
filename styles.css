@@ -931,15 +931,6 @@ body {
   gap: 8px;
 }
 
-.sal-code {
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 16px;
-  color: #71717a;
-  flex-shrink: 0;
-  min-width: 18px;
-}
 
 .sal-no-results {
   font-family: 'Inter', sans-serif;
