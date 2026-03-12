@@ -582,10 +582,14 @@ $btnSelectLang.addEventListener('click', () => {
   $subSayAsLangs.style.display = 'flex';
 
   const wrapRect = $ctxWrap.getBoundingClientRect();
-  const sayAsRect = $subSayAs.getBoundingClientRect();
+  const triggerRect = $btnSelectLang.getBoundingClientRect();
+  const searchWrap = $subSayAsLangs.querySelector('.sal-search-wrap');
+  const searchOffset = searchWrap
+    ? searchWrap.getBoundingClientRect().top - $subSayAsLangs.getBoundingClientRect().top
+    : 0;
 
-  // Align Level 3 top with Level 2 top
-  let offsetTop = sayAsRect.top - wrapRect.top;
+  // Align Search with Language/accent trigger
+  let offsetTop = triggerRect.top - wrapRect.top - searchOffset;
   if (offsetTop < 0) offsetTop = 0;
   $subSayAsLangs.style.marginTop = offsetTop + 'px';
   $subSayAsLangs.style.alignSelf = 'flex-start';
