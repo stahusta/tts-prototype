@@ -188,7 +188,7 @@ function openSubPanel(panel, triggerEl) {
 
   if (triggerEl) {
     const triggerRect = triggerEl.getBoundingClientRect();
-    const firstItem = panel.querySelector('.a-item');
+    const firstItem = panel.querySelector('.a-item, .sa-form');
     const firstItemOffset = firstItem
       ? firstItem.getBoundingClientRect().top - panel.getBoundingClientRect().top
       : 0;
