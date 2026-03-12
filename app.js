@@ -155,6 +155,7 @@ function closeSubPanels(instant) {
   for (const el of $ctxWrap.querySelectorAll('.active-path')) {
     el.classList.remove('active-path');
   }
+  $ctxWrap.classList.remove('flipped');
 }
 
 function hideMenu() {
@@ -169,6 +170,7 @@ function hideMenu() {
     $ctxWrap.classList.remove('visible');
   }
   closeSubPanels();
+  $ctxWrap.classList.remove('flipped');
 }
 
 function resetMenuState() {
@@ -208,12 +210,17 @@ function openSubPanel(panel, triggerEl) {
 
   requestAnimationFrame(() => {
     panel.classList.add('vis');
-    const rect = $ctxWrap.getBoundingClientRect();
-    if (rect.right > window.innerWidth - 12) {
-      let x = parseFloat($ctxWrap.style.left);
-      x = window.innerWidth - rect.width - 12;
-      if (x < 12) x = 12;
-      $ctxWrap.style.left = x + 'px';
+
+    // Flip sub-panels to left side if they overflow viewport right edge
+    const panelRect = panel.getBoundingClientRect();
+    if (panelRect.right > window.innerWidth - 12) {
+      $ctxWrap.classList.add('flipped');
+      // Shift wrap left to make room for sub-panel on the left
+      const currentLeft = parseFloat($ctxWrap.style.left);
+      const shiftNeeded = panelRect.width + 6; // panel width + gap
+      const newLeft = Math.max(12, currentLeft - shiftNeeded);
+      $ctxWrap.style.left = newLeft + 'px';
+      panel.style.setProperty('--origin', `right ${triggerEl ? triggerEl.getBoundingClientRect().top - $ctxWrap.getBoundingClientRect().top - offsetTop : 0}px`);
     }
   });
 }
@@ -601,12 +608,18 @@ $btnSelectLang.addEventListener('click', () => {
   $btnSelectLang.classList.add('active-path');
   requestAnimationFrame(() => {
     $subSayAsLangs.classList.add('vis');
-    const rect = $ctxWrap.getBoundingClientRect();
-    if (rect.right > window.innerWidth - 12) {
-      let x = parseFloat($ctxWrap.style.left);
-      x = window.innerWidth - rect.width - 12;
-      if (x < 12) x = 12;
-      $ctxWrap.style.left = x + 'px';
+
+    // Flip to left if overflowing right edge
+    const panelRect = $subSayAsLangs.getBoundingClientRect();
+    if (panelRect.right > window.innerWidth - 12) {
+      if (!$ctxWrap.classList.contains('flipped')) {
+        $ctxWrap.classList.add('flipped');
+        const currentLeft = parseFloat($ctxWrap.style.left);
+        const shiftNeeded = panelRect.width + 6;
+        const newLeft = Math.max(12, currentLeft - shiftNeeded);
+        $ctxWrap.style.left = newLeft + 'px';
+      }
+      $subSayAsLangs.style.setProperty('--origin', 'top right');
     }
   });
 });

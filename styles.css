@@ -512,6 +512,10 @@ body {
   pointer-events: auto;
 }
 
+.ctx-wrap.flipped .ctx-panel.sub {
+  order: -1;
+}
+
 .ctx-panel {
   font-family: 'Inter', sans-serif;
   background: #fff;
