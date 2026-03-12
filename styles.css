@@ -512,8 +512,8 @@ body {
   pointer-events: auto;
 }
 
-.ctx-wrap.flipped .ctx-panel.sub {
-  order: -1;
+.ctx-wrap.flipped {
+  flex-direction: row-reverse;
 }
 
 .ctx-panel {

@@ -133,7 +133,14 @@ function adjustMenuPosition() {
 // Context Menu — Visibility
 // ============================================
 
+let originalWrapLeft = null;
+
 function closeSubPanels(instant) {
+  // Restore original wrap position if it was flipped
+  if ($ctxWrap.classList.contains('flipped') && originalWrapLeft !== null) {
+    $ctxWrap.style.left = originalWrapLeft + 'px';
+    originalWrapLeft = null;
+  }
   for (const panel of SUB_PANELS) {
     if (!instant && panel.classList.contains('vis')) {
       panel.classList.remove('vis');
@@ -214,12 +221,11 @@ function openSubPanel(panel, triggerEl) {
     // Flip sub-panels to left side if they overflow viewport right edge
     const panelRect = panel.getBoundingClientRect();
     if (panelRect.right > window.innerWidth - 12) {
+      if (originalWrapLeft === null) originalWrapLeft = parseFloat($ctxWrap.style.left);
+      const mainLeft = $panelMain.getBoundingClientRect().left;
       $ctxWrap.classList.add('flipped');
-      // Shift wrap left to make room for sub-panel on the left
-      const currentLeft = parseFloat($ctxWrap.style.left);
-      const shiftNeeded = panelRect.width + 6; // panel width + gap
-      const newLeft = Math.max(12, currentLeft - shiftNeeded);
-      $ctxWrap.style.left = newLeft + 'px';
+      const newMainLeft = $panelMain.getBoundingClientRect().left;
+      $ctxWrap.style.left = (parseFloat($ctxWrap.style.left) + mainLeft - newMainLeft) + 'px';
       panel.style.setProperty('--origin', `right ${triggerEl ? triggerEl.getBoundingClientRect().top - $ctxWrap.getBoundingClientRect().top - offsetTop : 0}px`);
     }
   });
@@ -613,11 +619,11 @@ $btnSelectLang.addEventListener('click', () => {
     const panelRect = $subSayAsLangs.getBoundingClientRect();
     if (panelRect.right > window.innerWidth - 12) {
       if (!$ctxWrap.classList.contains('flipped')) {
+        if (originalWrapLeft === null) originalWrapLeft = parseFloat($ctxWrap.style.left);
+        const mainLeft = $panelMain.getBoundingClientRect().left;
         $ctxWrap.classList.add('flipped');
-        const currentLeft = parseFloat($ctxWrap.style.left);
-        const shiftNeeded = panelRect.width + 6;
-        const newLeft = Math.max(12, currentLeft - shiftNeeded);
-        $ctxWrap.style.left = newLeft + 'px';
+        const newMainLeft = $panelMain.getBoundingClientRect().left;
+        $ctxWrap.style.left = (parseFloat($ctxWrap.style.left) + mainLeft - newMainLeft) + 'px';
       }
       $subSayAsLangs.style.setProperty('--origin', 'top right');
     }
