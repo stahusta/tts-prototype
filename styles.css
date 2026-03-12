@@ -791,8 +791,8 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 0 8px;
   height: 16px;
-  padding: 0;
   font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 500;
@@ -810,19 +810,22 @@ body {
 
 .sa-helper {
   font-family: 'Inter', sans-serif;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
-  line-height: 20px;
+  line-height: 16px;
   color: #71717a;
-  padding: 4px 0 0;
+  padding: 8px 0 0;
 }
 
 .sa-lang-trigger {
   justify-content: space-between;
+  margin: 0 4px;
+  gap: 16px;
 }
 
 .sa-lang-trigger .ctx-v2-chevron {
   margin-left: auto;
+  flex-shrink: 0;
 }
 
 .sa-flag {
@@ -949,7 +952,7 @@ body {
 }
 
 .sa-form {
-  padding: 8px 12px;
+  padding: 8px 12px 0;
 }
 
 .sa-input-wrap {
