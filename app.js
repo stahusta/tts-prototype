@@ -615,15 +615,19 @@ $btnSelectLang.addEventListener('click', () => {
   requestAnimationFrame(() => {
     $subSayAsLangs.classList.add('vis');
 
-    // Flip to left if overflowing right edge
+    // Flip to left if overflowing right edge, or re-adjust if already flipped
     const panelRect = $subSayAsLangs.getBoundingClientRect();
-    if (panelRect.right > window.innerWidth - 12) {
-      if (!$ctxWrap.classList.contains('flipped')) {
-        if (originalWrapLeft === null) originalWrapLeft = parseFloat($ctxWrap.style.left);
-        const mainLeft = $panelMain.getBoundingClientRect().left;
-        $ctxWrap.classList.add('flipped');
-        const newMainLeft = $panelMain.getBoundingClientRect().left;
-        $ctxWrap.style.left = (parseFloat($ctxWrap.style.left) + mainLeft - newMainLeft) + 'px';
+    const needsFlip = panelRect.right > window.innerWidth - 12;
+    const alreadyFlipped = $ctxWrap.classList.contains('flipped');
+
+    if (needsFlip || alreadyFlipped) {
+      if (originalWrapLeft === null) originalWrapLeft = parseFloat($ctxWrap.style.left);
+      const mainLeft = $panelMain.getBoundingClientRect().left;
+      $ctxWrap.classList.add('flipped');
+      const newMainLeft = $panelMain.getBoundingClientRect().left;
+      const drift = mainLeft - newMainLeft;
+      if (Math.abs(drift) > 0.5) {
+        $ctxWrap.style.left = (parseFloat($ctxWrap.style.left) + drift) + 'px';
       }
       $subSayAsLangs.style.setProperty('--origin', 'top right');
     }
