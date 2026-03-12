@@ -193,10 +193,11 @@ function resetMenuState() {
 function openSubPanel(panel, triggerEl) {
   closeSubPanels(true);
 
-  // Show panel and ensure flex-start alignment before measuring
+  // Show panel and neutralise CSS scale(0.95) so measurements are 1:1
   panel.style.display = 'block';
   panel.style.alignSelf = 'flex-start';
   panel.style.marginTop = '0px';
+  panel.style.transform = 'scale(1)';
 
   const wrapRect = $ctxWrap.getBoundingClientRect();
   let offsetTop = 0;
@@ -215,6 +216,8 @@ function openSubPanel(panel, triggerEl) {
     panel.style.setProperty('--origin', `left ${triggerRect.top - wrapRect.top - offsetTop}px`);
   }
   panel.style.marginTop = offsetTop + 'px';
+  // Remove inline transform so CSS animation (.vis) can take over
+  panel.style.transform = '';
 
   // Cap sub-panel height to available viewport space
   const availBelow = window.innerHeight - wrapRect.top - offsetTop - 12;
@@ -606,10 +609,11 @@ $btnSelectLang.addEventListener('click', () => {
   // Capture Level 1 position BEFORE Level 3 enters layout
   const mainLeftBefore = $panelMain.getBoundingClientRect().left;
 
-  // Show panel and ensure flex-start alignment before measuring
+  // Show panel and neutralise CSS scale(0.95) so measurements are 1:1
   $subSayAsLangs.style.display = 'flex';
   $subSayAsLangs.style.alignSelf = 'flex-start';
   $subSayAsLangs.style.marginTop = '0px';
+  $subSayAsLangs.style.transform = 'scale(1)';
 
   // If flipped, Level 3 just pushed Level 1 right — compensate immediately
   if (isFlipped) {
@@ -631,6 +635,7 @@ $btnSelectLang.addEventListener('click', () => {
   let offsetTop = Math.round(triggerRect.top - wrapRect.top - searchOffset);
   if (offsetTop < 0) offsetTop = 0;
   $subSayAsLangs.style.marginTop = offsetTop + 'px';
+  $subSayAsLangs.style.transform = '';
 
   const availHeight = window.innerHeight - wrapRect.top - offsetTop - 12;
   $subSayAsLangs.style.maxHeight = Math.min(460, Math.max(availHeight, 150)) + 'px';
