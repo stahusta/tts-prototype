@@ -15,6 +15,9 @@ const MODIFIERS = {
 
 const MOD_ORDER = ['pause', 'accent', 'sayas'];
 
+const ANIM_DURATION = 120;   // ms — must match CSS transition-duration: 0.12s
+const VIEWPORT_MARGIN = 12;  // px — minimum gap from viewport edges
+
 // Color mapping per modifier type (from Figma tokens)
 const MOD_COLORS = {
   pause: [249, 115, 22],   // #f97316 — tag/warning/tag-orange-icon
@@ -114,13 +117,13 @@ function adjustMenuPosition() {
   let x = parseFloat($ctxWrap.style.left);
   let y = parseFloat($ctxWrap.style.top);
 
-  if (rect.right > window.innerWidth - 12) x = window.innerWidth - rect.width - 12;
+  if (rect.right > window.innerWidth - VIEWPORT_MARGIN) x = window.innerWidth - rect.width - VIEWPORT_MARGIN;
 
   // Check if menu overflows bottom
-  const overflowBottom = rect.bottom > window.innerHeight - 12;
+  const overflowBottom = rect.bottom > window.innerHeight - VIEWPORT_MARGIN;
   if (overflowBottom) y -= rect.bottom - window.innerHeight + 16;
-  if (x < 12) x = 12;
-  if (y < 12) y = 12;
+  if (x < VIEWPORT_MARGIN) x = VIEWPORT_MARGIN;
+  if (y < VIEWPORT_MARGIN) y = VIEWPORT_MARGIN;
 
   // Align sub-panels to bottom edge when pushed up, so they don't stack upward
   $ctxWrap.style.alignItems = overflowBottom ? 'flex-end' : 'flex-start';
@@ -151,7 +154,7 @@ function closeSubPanels(instant) {
         p.style.display = 'none';
         p.style.marginTop = '';
         p.style.alignSelf = '';
-      }, 120);
+      }, ANIM_DURATION);
     } else {
       panel.classList.remove('vis', 'closing');
       panel.style.display = 'none';
@@ -176,12 +179,11 @@ function hideMenu() {
       hideMenuTimer = null;
       $panelMain.classList.remove('closing');
       $ctxWrap.classList.remove('visible');
-    }, 120);
+    }, ANIM_DURATION);
   } else {
     $ctxWrap.classList.remove('visible');
   }
   closeSubPanels();
-  $ctxWrap.classList.remove('flipped');
 }
 
 function resetMenuState() {
@@ -220,7 +222,7 @@ function openSubPanel(panel, triggerEl) {
   panel.style.transform = '';
 
   // Cap sub-panel height to available viewport space
-  const availBelow = window.innerHeight - wrapRect.top - offsetTop - 12;
+  const availBelow = window.innerHeight - wrapRect.top - offsetTop - VIEWPORT_MARGIN;
   panel.style.maxHeight = Math.max(availBelow, 150) + 'px';
 
   requestAnimationFrame(() => {
@@ -228,7 +230,7 @@ function openSubPanel(panel, triggerEl) {
 
     // Flip sub-panels to left side if they overflow viewport right edge
     const panelRect = panel.getBoundingClientRect();
-    if (panelRect.right > window.innerWidth - 12) {
+    if (panelRect.right > window.innerWidth - VIEWPORT_MARGIN) {
       if (originalWrapLeft === null) originalWrapLeft = parseFloat($ctxWrap.style.left);
       const mainLeft = $panelMain.getBoundingClientRect().left;
       $ctxWrap.classList.add('flipped');
@@ -310,7 +312,7 @@ function openMenu(x, yBelow, word, mwEl, yAbove) {
     $panelMain.classList.add('vis');
 
     const panelHeight = $panelMain.getBoundingClientRect().height;
-    const spaceBelow = window.innerHeight - yBelow - 12;
+    const spaceBelow = window.innerHeight - yBelow - VIEWPORT_MARGIN;
 
     if (panelHeight > spaceBelow && yAbove !== undefined) {
       $ctxWrap.style.top = (yAbove - panelHeight) + 'px';
@@ -637,7 +639,7 @@ $btnSelectLang.addEventListener('click', () => {
   $subSayAsLangs.style.marginTop = offsetTop + 'px';
   $subSayAsLangs.style.transform = '';
 
-  const availHeight = window.innerHeight - wrapRect.top - offsetTop - 12;
+  const availHeight = window.innerHeight - wrapRect.top - offsetTop - VIEWPORT_MARGIN;
   $subSayAsLangs.style.maxHeight = Math.min(460, Math.max(availHeight, 150)) + 'px';
   $subSayAsLangs.style.setProperty('--origin', isFlipped ? 'top right' : 'top left');
 
@@ -648,7 +650,7 @@ $btnSelectLang.addEventListener('click', () => {
     // Flip if overflowing right edge (first time flip)
     if (!isFlipped) {
       const panelRect = $subSayAsLangs.getBoundingClientRect();
-      if (panelRect.right > window.innerWidth - 12) {
+      if (panelRect.right > window.innerWidth - VIEWPORT_MARGIN) {
         if (originalWrapLeft === null) originalWrapLeft = parseFloat($ctxWrap.style.left);
         const mainLeft = $panelMain.getBoundingClientRect().left;
         $ctxWrap.classList.add('flipped');

@@ -9,6 +9,10 @@
   box-sizing: border-box;
 }
 
+button, input {
+  font: inherit;
+}
+
 body {
   font-family: 'Inter', sans-serif;
   background: #fff;
@@ -56,7 +60,6 @@ body {
   background: none;
   border-radius: 8px;
   cursor: pointer;
-  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
@@ -120,7 +123,6 @@ body {
 
 /* --- Badges --- */
 .badge {
-  font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 500;
   line-height: 16px;
@@ -165,7 +167,6 @@ body {
   border: none;
   border-radius: 8px;
   background: transparent;
-  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
@@ -222,7 +223,6 @@ body {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
@@ -255,7 +255,6 @@ body {
 }
 
 .slide-te {
-  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
@@ -272,7 +271,6 @@ body {
   display: flex;
   gap: 4px;
   align-items: center;
-  font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 500;
   line-height: 16px;
@@ -366,7 +364,6 @@ body {
 }
 
 .toast-title {
-  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
@@ -374,7 +371,6 @@ body {
 }
 
 .toast-desc {
-  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
@@ -384,7 +380,6 @@ body {
 .toast-undo {
   border: none;
   background: none;
-  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
@@ -440,7 +435,7 @@ body {
   position: relative;
   cursor: pointer;
   display: inline;
-  transition: 0.15s;
+  transition: filter 0.15s;
   border: none;
   border-radius: 2px;
   padding: 0;
@@ -472,7 +467,6 @@ body {
   transform: translateX(-50%);
   background: #18181b;
   color: #fff;
-  font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 500;
   line-height: 16px;
@@ -517,7 +511,6 @@ body {
 }
 
 .ctx-panel {
-  font-family: 'Inter', sans-serif;
   background: #fff;
   border-radius: 8px;
   box-shadow:
@@ -560,7 +553,6 @@ body {
 /* Header & Separator */
 .ctx-hd {
   padding: 6px 12px;
-  font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 500;
   line-height: 16px;
@@ -588,7 +580,6 @@ body {
   border: none;
   background: none;
   width: 100%;
-  font-family: 'Inter', sans-serif;
   font-size: 14px;
   line-height: 20px;
   color: #18181b;
@@ -656,7 +647,6 @@ body {
 
 /* Group label */
 .ctx-v2-group-label {
-  font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 500;
   line-height: 16px;
@@ -751,12 +741,11 @@ body {
   border: none;
   border-radius: 4px;
   background: none;
-  font-family: 'Inter', sans-serif;
   font-size: 14px;
   line-height: 20px;
   color: #18181b;
   cursor: pointer;
-  transition: 0.1s;
+  transition: background 0.1s;
   text-align: left;
   width: calc(100% - 8px);
 }
@@ -797,7 +786,6 @@ body {
   gap: 8px;
   padding: 0 8px;
   height: 16px;
-  font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 500;
   line-height: 16px;
@@ -813,7 +801,6 @@ body {
 }
 
 .sa-helper {
-  font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 400;
   line-height: 16px;
@@ -888,7 +875,6 @@ body {
   flex: 1;
   border: none;
   background: none;
-  font-family: 'Inter', sans-serif;
   font-size: 14px;
   line-height: 20px;
   color: #18181b;
@@ -933,7 +919,6 @@ body {
 
 
 .sal-no-results {
-  font-family: 'Inter', sans-serif;
   font-size: 13px;
   color: #a1a1aa;
   padding: 12px;
@@ -966,7 +951,6 @@ body {
   flex: 1;
   border: none;
   background: none;
-  font-family: 'Inter', sans-serif;
   font-size: 14px;
   line-height: 20px;
   color: #18181b;
@@ -981,7 +965,6 @@ body {
 .btn-apply-inline {
   border: none;
   background: none;
-  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
