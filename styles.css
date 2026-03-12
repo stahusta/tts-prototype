@@ -925,26 +925,20 @@ body {
   background: #a1a1aa;
 }
 
-.sal-group {
-  padding: 0;
-}
-
-.sal-lang-name {
+.sal-item {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.sal-code {
   font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 500;
   line-height: 16px;
   color: #71717a;
-  padding: 6px 8px;
-  margin: 0 4px;
-  user-select: none;
-}
-
-.sal-accent {
-  padding-left: 32px !important;
+  flex-shrink: 0;
+  min-width: 18px;
 }
 
 .sal-no-results {

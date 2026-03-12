@@ -648,64 +648,25 @@ $btnSelectLang.addEventListener('click', () => {
 $subSayAsLangs.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-sal]');
   if (!btn || !savedSelection) return;
-
-  const group = btn.closest('.sal-group');
-  const langName = group?.querySelector('.sal-lang-name');
-  let badge;
-
-  if (langName && btn.classList.contains('sal-accent')) {
-    // Accent item — show "Flag Language, Accent"
-    const lang = langName.textContent.trim();
-    badge = lang + ', ' + btn.textContent.trim();
-  } else {
-    badge = btn.textContent.trim();
-  }
-
-  applyModifier('sayas', 'lang:' + btn.dataset.sal, badge);
+  applyModifier('sayas', 'lang:' + btn.dataset.sal, btn.textContent.trim());
 });
 
 // Level 3: fuzzy search filtering
 $salSearch.addEventListener('input', () => {
   const q = $salSearch.value.trim();
-  const groups = $salList.querySelectorAll('.sal-group');
+  const items = $salList.querySelectorAll('.sal-item');
   let anyVisible = false;
 
-  if (!q) {
-    for (const group of groups) {
-      group.style.display = '';
-      const langNameEl = group.querySelector('.sal-lang-name');
-      if (langNameEl) langNameEl.style.display = '';
-      for (const a of group.querySelectorAll('.sal-accent')) a.style.display = '';
-      const singleItem = group.querySelector('.a-item:not(.sal-accent)');
-      if (singleItem) singleItem.style.display = '';
-    }
-    anyVisible = true;
-  } else {
-    for (const group of groups) {
-      const lang = group.dataset.lang || '';
-      const accents = [...group.querySelectorAll('.sal-accent')];
-      const langNameEl = group.querySelector('.sal-lang-name');
-      const singleItem = group.querySelector('.a-item:not(.sal-accent)');
-
-      const langResult = fuzzyMatch(q, lang);
-
-      if (accents.length > 0) {
-        let groupVisible = false;
-        for (const a of accents) {
-          const accentResult = fuzzyMatch(q, a.textContent);
-          const show = langResult.match || accentResult.match;
-          a.style.display = show ? '' : 'none';
-          if (show) groupVisible = true;
-        }
-        group.style.display = groupVisible ? '' : 'none';
-        if (langNameEl) langNameEl.style.display = groupVisible ? '' : 'none';
-        if (groupVisible) anyVisible = true;
-      } else if (singleItem) {
-        const itemResult = fuzzyMatch(q, singleItem.textContent);
-        const match = langResult.match || itemResult.match;
-        group.style.display = match ? '' : 'none';
-        if (match) anyVisible = true;
-      }
+  for (const item of items) {
+    if (!q) {
+      item.style.display = '';
+      anyVisible = true;
+    } else {
+      const lang = item.dataset.lang || '';
+      const text = item.textContent;
+      const match = fuzzyMatch(q, lang).match || fuzzyMatch(q, text).match;
+      item.style.display = match ? '' : 'none';
+      if (match) anyVisible = true;
     }
   }
 
