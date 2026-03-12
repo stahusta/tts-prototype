@@ -165,11 +165,15 @@ function closeSubPanels(instant) {
   $ctxWrap.classList.remove('flipped');
 }
 
+let hideMenuTimer = null;
+
 function hideMenu() {
+  if (hideMenuTimer) { clearTimeout(hideMenuTimer); hideMenuTimer = null; }
   if ($panelMain.classList.contains('vis')) {
     $panelMain.classList.remove('vis');
     $panelMain.classList.add('closing');
-    setTimeout(() => {
+    hideMenuTimer = setTimeout(() => {
+      hideMenuTimer = null;
       $panelMain.classList.remove('closing');
       $ctxWrap.classList.remove('visible');
     }, 120);
@@ -283,7 +287,12 @@ function buildMainPanel(word, mwEl) {
 }
 
 function openMenu(x, yBelow, word, mwEl, yAbove) {
-  hideMenu();
+  // Cancel any pending close animation
+  if (hideMenuTimer) { clearTimeout(hideMenuTimer); hideMenuTimer = null; }
+  $panelMain.classList.remove('closing', 'vis');
+  closeSubPanels(true);
+  $ctxWrap.classList.remove('flipped');
+
   buildMainPanel(word, mwEl);
 
   $panelMain.style.setProperty('--origin', 'top left');
@@ -715,7 +724,11 @@ $ctxWrap.addEventListener('mousedown', (e) => {
 // ============================================
 
 document.addEventListener('mousedown', (e) => {
-  if (!$ctxWrap.contains(e.target) && $ctxWrap.classList.contains('visible')) resetMenuState();
+  if ($ctxWrap.contains(e.target)) return;
+  if (!$ctxWrap.classList.contains('visible')) return;
+  // Don't close if clicking inside an editor (mouseup will handle re-open)
+  if (e.target.closest('.te')) return;
+  resetMenuState();
 });
 
 document.addEventListener('keydown', (e) => {
