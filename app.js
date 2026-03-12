@@ -591,8 +591,22 @@ $btnSelectLang.addEventListener('click', () => {
   $salSearch.value = '';
   $salSearch.dispatchEvent(new Event('input'));
 
+  const isFlipped = $ctxWrap.classList.contains('flipped');
+
+  // Capture Level 1 position BEFORE Level 3 enters layout
+  const mainLeftBefore = $panelMain.getBoundingClientRect().left;
+
   // Show panel to measure offset
   $subSayAsLangs.style.display = 'flex';
+
+  // If flipped, Level 3 just pushed Level 1 right — compensate immediately
+  if (isFlipped) {
+    const mainLeftAfter = $panelMain.getBoundingClientRect().left;
+    const drift = mainLeftBefore - mainLeftAfter;
+    if (Math.abs(drift) > 0.5) {
+      $ctxWrap.style.left = (parseFloat($ctxWrap.style.left) + drift) + 'px';
+    }
+  }
 
   const wrapRect = $ctxWrap.getBoundingClientRect();
   const triggerRect = $btnSelectLang.getBoundingClientRect();
@@ -609,27 +623,23 @@ $btnSelectLang.addEventListener('click', () => {
 
   const availHeight = window.innerHeight - wrapRect.top - offsetTop - 12;
   $subSayAsLangs.style.maxHeight = Math.min(460, Math.max(availHeight, 150)) + 'px';
-  $subSayAsLangs.style.setProperty('--origin', 'top left');
+  $subSayAsLangs.style.setProperty('--origin', isFlipped ? 'top right' : 'top left');
 
   $btnSelectLang.classList.add('active-path');
   requestAnimationFrame(() => {
     $subSayAsLangs.classList.add('vis');
 
-    // Flip to left if overflowing right edge, or re-adjust if already flipped
-    const panelRect = $subSayAsLangs.getBoundingClientRect();
-    const needsFlip = panelRect.right > window.innerWidth - 12;
-    const alreadyFlipped = $ctxWrap.classList.contains('flipped');
-
-    if (needsFlip || alreadyFlipped) {
-      if (originalWrapLeft === null) originalWrapLeft = parseFloat($ctxWrap.style.left);
-      const mainLeft = $panelMain.getBoundingClientRect().left;
-      $ctxWrap.classList.add('flipped');
-      const newMainLeft = $panelMain.getBoundingClientRect().left;
-      const drift = mainLeft - newMainLeft;
-      if (Math.abs(drift) > 0.5) {
-        $ctxWrap.style.left = (parseFloat($ctxWrap.style.left) + drift) + 'px';
+    // Flip if overflowing right edge (first time flip)
+    if (!isFlipped) {
+      const panelRect = $subSayAsLangs.getBoundingClientRect();
+      if (panelRect.right > window.innerWidth - 12) {
+        if (originalWrapLeft === null) originalWrapLeft = parseFloat($ctxWrap.style.left);
+        const mainLeft = $panelMain.getBoundingClientRect().left;
+        $ctxWrap.classList.add('flipped');
+        const newMainLeft = $panelMain.getBoundingClientRect().left;
+        $ctxWrap.style.left = (parseFloat($ctxWrap.style.left) + mainLeft - newMainLeft) + 'px';
+        $subSayAsLangs.style.setProperty('--origin', 'top right');
       }
-      $subSayAsLangs.style.setProperty('--origin', 'top right');
     }
   });
 });
